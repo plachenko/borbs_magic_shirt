@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "bnd": "npm run build && npm run deploy",
     "build": "vue-cli-service build",
-    "deploy": "gh-pages -d dist -b master",
+    "deploy": "gh-pages -d dist",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
