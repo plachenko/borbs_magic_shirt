@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
+    "bnd": "npm run build && npm run deploy",
     "build": "vue-cli-service build",
+    "deploy": "gh-pages -d dist -b master",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
