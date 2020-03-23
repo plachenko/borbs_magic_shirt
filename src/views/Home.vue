@@ -1,18 +1,24 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div ref="hand" style="background-color:#F00; right: 0px; height: 120px; position: absolute;"></div>
+    <BCan />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import BCan from '../components/BCan'
 
 export default {
   name: 'Home',
   components: {
-    HelloWorld
+    BCan
+  },
+  mounted(){
+    window.addEventListener('mousemove', (e)=> {
+      this.$refs.hand.style.width = (window.innerWidth - e.offsetX) - 40 + "px";
+      this.$refs.hand.style.top = e.offsetY + "px";
+    })
   }
 }
 </script>
