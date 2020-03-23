@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <a href="#" @click="coloring = !coloring">color</a>
+    <!-- <a href="#" @click="coloring = !coloring">color</a> -->
     <BCan :color="color" />
     <BColor @colorSelect="color = $event" />
   </div>
@@ -21,10 +21,6 @@ export default {
       coloring: false,
       color: "rgb(0,0,0)",
     }
-  },
-  methods: {
-  },
-  mounted(){
   }
 }
 </script>

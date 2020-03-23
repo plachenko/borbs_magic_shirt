@@ -8,7 +8,7 @@
       <a href="#" @click="save">save</a>
     </div>
     <div ref="cap" id="cap" />
-    <canvas v-for="(i, idx) in 2" :key="idx" ref="can" :style="{zIndex: maxZ-idx}" />
+    <canvas v-for="(i, idx) in 3" :key="idx" ref="can" :style="{zIndex: maxZ-idx}" />
   </div>
 </template>
 
@@ -29,7 +29,9 @@ export default {
       gif: null,
       maxFrame: 9,
       curFrame: 0,
-      timer: 0
+      timer: 0,
+      saving: false,
+      i: 0
     }
   },
   watch:{
@@ -44,14 +46,14 @@ export default {
     },
     dim: {
       type: Object,
-      default: function() { 
+      default: function() {
         return{
-          w: 300, 
-          h: 300 
-        } 
+          w: 600,
+          h: 600
+        }
       }
     }
-  }, 
+  },
   methods: {
     clearCan(){
       this.frame = [];
@@ -71,17 +73,21 @@ export default {
       })
     },
     save(){
-      let i = 0;
+      const data = this.cans[1].can.toDataURL();
+      console.log(data);
+      // this.saving = true;
+      // this.cans[2].can.width = 5 * 300;
+      /*
       while(i < 4){
         setTimeout(() => {
           const data = this.cans[1].can.toDataURL();
-          console.log(data);
           i++;
         }, 1000)
       }
+      */
     },
     draw(frame, _idx){
-      let ctx = this.cans[_idx].ctx
+      const ctx = this.cans[_idx].ctx
       if(frame.length){
         frame.forEach((strokes, idx) =>{
           if(_idx){
@@ -96,7 +102,7 @@ export default {
           strokes.forEach((stroke) => {
             ctx.lineTo(stroke[0] + Math.round(Math.random()*3), stroke[1]+ Math.round(Math.random()*3));
           });
-          
+
           // ctx.strokeStyle = "rgb(255,0,0)";
           ctx.closePath();
           ctx.fill();
@@ -109,17 +115,20 @@ export default {
         window.requestAnimationFrame(this.update);
         this.clear(this.cans[1]);
         this.draw(this.frame, 1);
-        /*
-        if(this.gif){
-          if(this.curFrame < this.maxFrame){
-            this.curFrame++;
-            this.gif.addFrame(this.cans[1].ctx, {copy: true, delay: 100});
-          }else{
-            this.curFrame = 0;
-            this.gif.render();
+        if(this.i <= 4 && this.saving){
+          this.i++;
+          // console.log(this.cans[2].ctx)
+          this.cans[2].ctx.drawImage(this.cans[1].can, this.i*300, 0);
+          // console.log(this.cans[2].can)
+          if(this.i == 4){
+            const data = this.cans[2].can.toDataURL();
+            console.log(data);
+            this.cans[2].can.width = 300;
           }
+        }else{
+          this.saving = false;
+          this.i = 0;
         }
-        */
       }, this.speed);
     }
   },
@@ -129,7 +138,7 @@ export default {
       this.$refs.cont.style.width = this.dim.w + "px";
       this.$refs.cont.style.height = this.dim.h + "px";
 
-      for(let can of this.$refs.can){
+      for(const can of this.$refs.can){
         can.width = this.dim.w;
         can.height = this.dim.h;
         this.cans.push({can: can, ctx: can.getContext('2d')});
@@ -168,7 +177,7 @@ export default {
       });
 
       this.$refs.cap.addEventListener('pointermove', (e) => {
-        let strokes = []
+        const strokes = []
         if(e.pressure){
           if(this.tool == 0){
             this.timer ++;
@@ -177,14 +186,14 @@ export default {
 
             /*
             let prev = this.stroke[this.timer-1];
-            let cur = this.stroke[this.timer]; 
+            let cur = this.stroke[this.timer];
             let xDiff = (prev[0] - cur[0]) ** 2;
             let yDiff = (prev[1] - cur[1]) ** 2;
             let dist = Math.sqrt(xDiff + yDiff);
             */
 
             if(this.sym){
-              let x = this.startPosition.x + (this.startPosition.x - e.offsetX);
+              const x = this.startPosition.x + (this.startPosition.x - e.offsetX);
               this.strokeSym.push([x, e.offsetY]);
               strokes[1] = this.strokeSym;
             }
