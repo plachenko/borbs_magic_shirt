@@ -1,11 +1,20 @@
 <template>
   <div ref="cont" id="bcan">
-    <div id="toolbar" style="position: absolute; top: -20px;">
+    <span ref="text" v-show="text.length && textShow" style="width: 370px; font-weight: bold; position: absolute;">{{text}}</span>
+    <div id="toolbar" style="position: absolute; bottom: -20px; right: 0px;">
       <a href="#" @click="tool = 0">draw</a>
+      <!--
+      <a href="#" @click="addCan">addLayer</a>
+      <input type="number" v-model="canIdx" min="1" :max="cans.length" />
+      -->
       <a href="#" @click="tool = 1">move</a>
+      <a href="#" @click="tool = 2">text</a>
+      <a href="#" @click="textShow = !textShow">s</a>
       <a href="#" @click="clearCan">clear</a>
+      <a href="#" @click="$emit('colorEvt')">color</a>
       <a href="#" @click="sym = !sym">symmetry: {{sym ? "on" : "off"}}</a>
       <a href="#" @click="save">save</a>
+      <input v-model="text" />
     </div>
     <div ref="cap" id="cap" />
     <canvas v-for="(i, idx) in 3" :key="idx" ref="can" :style="{zIndex: maxZ-idx}" />
@@ -20,10 +29,13 @@ export default {
       tool: 0,
       sym: false,
       speed: 100,
-      maxZ: 9998,
+      maxZ: 9997,
+      textShow: true,
       cans: [],
       stroke: [],
       strokeSym: [],
+      canIdx: 1,
+      text: '',
       frame: [],
       colors: [],
       gif: null,
@@ -31,10 +43,21 @@ export default {
       curFrame: 0,
       timer: 0,
       saving: false,
+      offset: {
+        x: 0,
+        y: 0
+      },
       i: 0
     }
   },
   watch:{
+    dim(v){
+
+      for(const can of this.$refs.can){
+        can.width = v.w;
+        can.height = v.h;
+      }
+    },
     color(){
       this.tool = 0;
     }
@@ -48,13 +71,16 @@ export default {
       type: Object,
       default: function() {
         return{
-          w: 600,
-          h: 600
+          w:  500,
+          h: 500
         }
       }
     }
   },
   methods: {
+    addCan(){
+      console.log('adding canvas.');
+    },
     clearCan(){
       this.frame = [];
       this.colors = [];
@@ -87,7 +113,9 @@ export default {
       */
     },
     draw(frame, _idx){
+      const rand = 2;
       const ctx = this.cans[_idx].ctx
+
       if(frame.length){
         frame.forEach((strokes, idx) =>{
           if(_idx){
@@ -99,14 +127,12 @@ export default {
           ctx.beginPath();
           ctx.moveTo(strokes[0][0], strokes[0][1]);
 
-          strokes.forEach((stroke) => {
-            ctx.lineTo(stroke[0] + Math.round(Math.random()*3), stroke[1]+ Math.round(Math.random()*3));
+          strokes.forEach((stroke,idx) => {
+            ctx.lineTo(stroke[0] + Math.round(Math.random()*rand), stroke[1]+ Math.round(Math.random()*rand));
           });
 
-          // ctx.strokeStyle = "rgb(255,0,0)";
           ctx.closePath();
           ctx.fill();
-          // ctx.stroke();
         });
       }
     },
@@ -115,25 +141,16 @@ export default {
         window.requestAnimationFrame(this.update);
         this.clear(this.cans[1]);
         this.draw(this.frame, 1);
-        if(this.i <= 4 && this.saving){
-          this.i++;
-          // console.log(this.cans[2].ctx)
-          this.cans[2].ctx.drawImage(this.cans[1].can, this.i*300, 0);
-          // console.log(this.cans[2].can)
-          if(this.i == 4){
-            const data = this.cans[2].can.toDataURL();
-            console.log(data);
-            this.cans[2].can.width = 300;
-          }
-        }else{
-          this.saving = false;
-          this.i = 0;
-        }
       }, this.speed);
     }
   },
   mounted(){
     this.$nextTick(() => {
+
+      const cap = this.$refs.cap.getBoundingClientRect()
+
+      this.offset.x = cap.left;
+      this.offset.y = cap.top;
 
       this.$refs.cont.style.width = this.dim.w + "px";
       this.$refs.cont.style.height = this.dim.h + "px";
@@ -145,11 +162,12 @@ export default {
       }
 
       this.$refs.cap.addEventListener('pointerdown', (e) => {
+        console.log(this.$refs.cap.getBoundingClientRect().left);
         if(this.tool == 0){
-          this.stroke.push([e.offsetX, e.offsetY]);
+          this.stroke.push([e.offsetX-125, e.offsetY-125]);
           this.draw([this.stroke], 0);
         }
-        if(this.tool == 1 || this.sym){
+        if(this.tool == 1 || this.sym || this.tool ==2){
           this.startPosition = {x: e.offsetX, y: e.offsetY};
         }
         if(this.sym){
@@ -159,7 +177,7 @@ export default {
 
       this.$refs.cap.addEventListener('pointerup', (e) => {
         if(this.tool == 0){
-          this.stroke.push([e.offsetX, e.offsetY]);
+          this.stroke.push([e.offsetX-125, e.offsetY-125]);
           this.frame.push(this.stroke);
           if(this.sym){
             this.frame.push(this.strokeSym);
@@ -181,7 +199,7 @@ export default {
         if(e.pressure){
           if(this.tool == 0){
             this.timer ++;
-            this.stroke.push([e.offsetX, e.offsetY]);
+            this.stroke.push([e.offsetX - 125, e.offsetY - 125]);
             strokes[0] = this.stroke;
 
             /*
@@ -208,6 +226,11 @@ export default {
             this.startPosition.y = e.offsetY;
             // this.move(e.offsetX - (this.startPosition.x - e.offsetX), e.offsetY - (this.startPosition.y - e.offsetY));
           }
+          if(this.tool == 2){
+
+            this.$refs.text.style.left = e.offsetX - this.startPosition.x + "px";
+            this.$refs.text.style.top = e.offsetY - this.startPosition.y + "px";
+          }
         }
         });
 
@@ -225,11 +248,11 @@ export default {
   }
   #cap{
     position: absolute;
-    left: 0px;
-    top: 0px;
-    width: 100%;
-    height: 100%;
-    z-index: 9999;
+    left: -25%;
+    top: -25%;
+    width: 150%;
+    height: 150%;
+    z-index: 9998;
   }
   canvas{
     position: absolute;
@@ -237,8 +260,14 @@ export default {
     top: 0px;
     border: 1px solid;
   }
+  #toolbar input{
+    position: relative;
+    z-index: 9999;
+  }
   #toolbar a{
     display: inline-block;
+    position: relative;
+    z-index: 9999;
     margin: 0px 4px;
     text-decoration: none;
     user-select: none;

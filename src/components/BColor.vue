@@ -108,6 +108,7 @@ export default {
     float: left;
     width: 300px;
     padding: 10px;
+    z-index: 9999;  
     }
     form{
       width: 250px;
