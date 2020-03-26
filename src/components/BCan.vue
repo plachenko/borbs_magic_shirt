@@ -1,5 +1,6 @@
 <template>
   <div ref="cont" id="bcan">
+    <input style="position: absolute; top: -30px; width: 500px; z-index: 9999;" max="200" type="range" v-model="animFrame" />
     <span ref="text" v-show="text.length && textShow" style="width: 370px; font-weight: bold; position: absolute;">{{text}}</span>
     <div id="toolbar" style="position: absolute; bottom: -20px; right: 0px;">
       <a href="#" @click="tool = 0">draw</a>
@@ -36,10 +37,13 @@ export default {
       strokeSym: [],
       canIdx: 1,
       text: '',
+      frames: [],
       frame: [],
       colors: [],
       gif: null,
       maxFrame: 9,
+      anim: false,
+      animFrame: 0,
       curFrame: 0,
       timer: 0,
       saving: false,
@@ -100,7 +104,7 @@ export default {
     },
     save(){
       const data = this.cans[1].can.toDataURL();
-      console.log(data);
+      // console.log(data);
       // this.saving = true;
       // this.cans[2].can.width = 5 * 300;
       /*
@@ -116,7 +120,7 @@ export default {
       const rand = 2;
       const ctx = this.cans[_idx].ctx
 
-      if(frame.length){
+      if(frame){
         frame.forEach((strokes, idx) =>{
           if(_idx){
             ctx.fillStyle = this.colors[idx];
@@ -131,8 +135,9 @@ export default {
             ctx.lineTo(stroke[0] + Math.round(Math.random()*rand), stroke[1]+ Math.round(Math.random()*rand));
           });
 
-          ctx.closePath();
-          ctx.fill();
+          // ctx.closePath();
+          // ctx.fill();
+          ctx.stroke();
         });
       }
     },
@@ -140,7 +145,7 @@ export default {
       setTimeout(() => {
         window.requestAnimationFrame(this.update);
         this.clear(this.cans[1]);
-        this.draw(this.frame, 1);
+        this.draw(this.frames[this.animFrame], 1);
       }, this.speed);
     }
   },
@@ -177,8 +182,10 @@ export default {
 
       this.$refs.cap.addEventListener('pointerup', (e) => {
         if(this.tool == 0){
+          this.animFrame = 0;
           this.stroke.push([e.offsetX-125, e.offsetY-125]);
           this.frame.push(this.stroke);
+          // this.frames[this.animFrame].push(this.frame);animFrame
           if(this.sym){
             this.frame.push(this.strokeSym);
             this.colors.push(this.color);
@@ -217,6 +224,15 @@ export default {
             }
 
             this.clear(this.cans[0]);
+            if(this.anim){
+              this.animFrame++;
+              // console.log(this.frames[this.animFrame])
+              if(this.frames[this.animFrame]){
+                this.frames[this.animFrame].push(this.stroke)
+              }else{
+                this.frames[this.animFrame] = this.stroke;
+              }
+            }
             this.draw(strokes, 0);
           }
           if(this.tool == 1){
