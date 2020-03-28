@@ -21,13 +21,12 @@ export default {
       frameNum: 0,
       frameMax: 0,
       frames: [],
-      playing: false
+      playing: true
     }
   },
   watch:{
     color(v){
       //
-
     },
     curPos:{
       deep: true,
@@ -35,7 +34,7 @@ export default {
         this.clearCan(1);
         if(v){
           this.stroke.push(v);
-          this.draw(1, [this.stroke]);
+          this.draw(1, [{stroke: this.stroke, color: this.color}]);
         }else{
           this.strokes.push(this.stroke);
           this.stroke = [];
@@ -84,8 +83,10 @@ export default {
     },
     draw(idx, strokes){
       const ctx = this.$refs.can[idx].getContext('2d');
-      strokes.forEach((stroke, i) => {
-        ctx.fillStyle = '#'+this.color;
+
+      /*
+      strokes.stroke.forEach((stroke, i) => {
+        ctx.fillStyle = '#'+stroke.color;
         ctx.beginPath();
         ctx.moveTo(stroke[0].x, strokes[0].y);
 
@@ -97,17 +98,17 @@ export default {
         ctx.fill();
         // ctx.stroke();
       });
+      */
+      // console.log(strokes.stroke, strokes.color);
     },
     update(){
-      this.frames.push(this.strokes);
-
-      if(this.frames[this.frameNum]){
-        this.draw(0, this.frames[this.frameNum]);
-      }
-
       if(this.playing){
         this.clearCan(0);
+        this.frames.push({stroke: this.strokes, color: this.color});
 
+        if(this.frames[this.frameNum]){
+          this.draw(0, this.frames[this.frameNum]);
+        }
         setTimeout(() => {
           window.requestAnimationFrame(this.update);
           if(this.frameNum < this.frameMax){

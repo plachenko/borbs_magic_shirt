@@ -3,8 +3,8 @@
 
     <div ref="cap" id="cap" />
     <div ref="brush" id="brush">
-      <canvas width="26" height="19" ref="tip" style="left: 0px; position: absolute;"/>
-      <img @onload="tipLoad()" src="./assets/tip.png" id="tip" style="display:none;" />
+      <!-- <canvas width="26" height="19" ref="tip" style="left: 0px; position: absolute;"/> -->
+      <img @onload="tipLoad" ref="tip" src="./assets/tip.png" id="tip" />
       <img src="./assets/brush.png" style="left: 25px; position: absolute;" />
       <div id="sleeve" />
     </div>
