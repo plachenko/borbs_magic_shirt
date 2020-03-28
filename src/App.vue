@@ -1,37 +1,189 @@
 <template>
   <div id="app">
 
-    <!--
-    <div style="postion: absolute; top: 0px; left: 0px; flex:1;">
-      <input v-model="width" />
-      <input v-model="height" />
+    <div ref="cap" id="cap" />
+    <div ref="brush" id="brush">
+      <canvas width="26" height="19" ref="tip" style="left: 0px; position: absolute;"/>
+      <img @onload="tipLoad()" src="./assets/tip.png" id="tip" style="display:none;" />
+      <img src="./assets/brush.png" style="left: 25px; position: absolute;" />
+      <div id="sleeve" />
     </div>
-    -->
-    <div style="padding-top: 10px; display: flex; justify-content: center; align-items: center;">
-      <BCan :color="color" @colorEvt="coloring = !coloring" />
-      <BColor v-show="coloring" @colorSelect="color = $event" />
+
+    <div id="container">
+      <div id="middle">
+        <div id="refImg" ref="refImg"></div>
+        <div id="menu">
+          <a href="#" @click="save">Save</a>
+          <a href="#" @click="$refs.paintCan.clearAll()">Clear</a>
+          <a href="#" @click="camera">Camera</a>
+          <input type="file" ref="file" @change="load" style="display:none" />
+          <a href="#" @click="$refs.file.click()">Load</a>
+        </div>
+        <div id="canvasContainer" ref="canContainer">
+          <img style="position: absolute; z-index: 9995;" src="./assets/canvas.png" />
+          <BCan ref="paintCan" id="paintCan" :curPos="curPos" :color="color" />
+        </div>
+        <div id="pallet" >
+          <div ref="pallet" style="display: flex; width: 100%; position: absolute; height: 100%;">
+            <div
+              class="palletCol"
+              v-for="(col, idx) in colors"
+              :key="idx"
+              @click="color = col"
+              />
+          </div>
+          <!-- <canvas ref="palletCan" width="315" height="35" /> -->
+          <img src="./assets/pallet.png" ref="palletImg">
+        </div>
+      </div>
     </div>
-    <!-- <a href="#" @click="coloring = !coloring">color</a> -->
+
   </div>
 </template>
 
 <script>
 import BCan from './components/BCan';
-import BColor from './components/BColor';
+// import BColor from './components/BColor';
+import gsap from 'gsap';
 
 export default {
   name: 'App',
   components: {
     BCan,
-    BColor
+    // BColor
   },
   data: function(){
     return{
       coloring: false,
-      color: "rgb(0,0,0)",
-      width: 600,
-      height: 600
+      color: "000000",
+      palletShow: false,
+      refOpen: false,
+      curPos: null,
+      armShow: true,
+      colors:[
+        '000000',
+        'FFFFFF',
+        'F2B7D6',
+        'E91D3B',
+        'FDBC24',
+        '45B5F1',
+        'A776EE',
+        '58E8A4',
+        '162770',
+        '5A2F1C',
+        'F7EB3D',
+        'C7C6C7',
+        '115011',
+        '380E74'
+      ]
     }
+  },
+  methods:{
+    save(){
+      console.log('saving.');
+    },
+    camera(){
+      if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function (stream) {
+          // video.srcObject = stream;
+        })
+        .catch(function (err) {
+          console.log("Something went wrong!");
+        });
+      }
+    },
+    load(e){
+      const target = e.target.files;
+      const url = URL.createObjectURL(target[0])
+      let delay = 0;
+
+      if(this.refOpen){
+        delay = 1.5
+        gsap.to('#refImg', 1, {top: -230});
+      }
+
+      setTimeout(() => {
+        this.$refs.refImg.style.backgroundImage = "url(" + url + ")";
+      }, delay * 1000);
+
+      gsap.to('#refImg', 1, {top: 10, delay: delay});
+      this.refOpen = true;
+    },
+    tipLoad(){
+      console.log('loaded');
+      const ctx = this.$refs.tip.getContext('2d');
+      const img = document.getElementById('tip');
+
+      ctx.drawImage(img, 10, 0);
+      ctx.fillRect(0,0,10,10);
+    }
+  },
+  mounted(){
+    let paintPos, palletPos;
+    let md = false;
+    this.$nextTick(() => {
+
+      this.$refs.canContainer.style.marginTop = (window.innerHeight/2) - 250  + "px";
+      paintPos = this.$refs.paintCan.$el.getBoundingClientRect()
+    });
+
+    this.$refs.pallet.addEventListener('pointerdown', (e) => {
+      this.$refs.brush.style.bottom = 40 + 'px';
+    });
+    this.$refs.pallet.addEventListener('pointerup', (e) => {
+      this.$refs.brush.style.bottom = 75 + 'px';
+    });
+    this.$refs.pallet.addEventListener('pointermove', (e) => {
+      this.$refs.brush.style.width = (window.innerWidth - e.screenX) + 'px';
+      if(!e.pressure){
+        this.$refs.brush.style.left = e.screenX - 8 + 'px';
+      }
+    });
+
+    this.$refs.cap.addEventListener('pointermove', (e) => {
+      this.$refs.brush.style.width = (window.innerWidth - e.offsetX) + 'px';
+      let top = e.screenY + 'px'
+
+      // Draw.
+      if(e.pressure){
+        md = true;
+      }else{
+        md = false;
+      }
+
+      if((e.offsetX > paintPos.x - 50 && e.offsetX < paintPos.x + paintPos.width + 50) &&
+        (e.offsetY > paintPos.y && e.offsetY -50 < paintPos.y + paintPos.height + 20)){
+        if(md){
+          const x = Math.round(e.offsetX - paintPos.x);
+          const y = Math.round(e.offsetY - paintPos.y);
+          this.curPos = {x: x, y: y};
+          this.$refs.tip.style.top = "-4px";
+          this.$refs.tip.style.left = "6px";
+          this.$refs.tip.style.transform = "scaleX(-1) rotate(90deg)";
+        }else{
+          this.$refs.tip.style.top = "0px";
+          this.$refs.tip.style.left = "0px";
+          this.$refs.tip.style.transform = "rotate(0deg)";
+          this.curPos = null;
+        }
+      }
+
+      if(e.offsetY > window.innerHeight - 80 && !this.palletShow){
+        this.palletShow = true;
+        gsap.to('#pallet', {bottom: -5})
+        top = e.offsetY - 85;
+        this.$refs.brush.style.transform = "scaleY(-1)"
+      } else if(e.offsetY < window.innerHeight - 79){
+        gsap.to('#pallet', {bottom: -65})
+        top = e.offsetY
+        this.$refs.brush.style.transform = "scaleY(1)"
+        this.palletShow = false;
+      }
+
+      this.$refs.brush.style.top = top + 'px';
+      this.$refs.brush.style.left = e.offsetX - 15 + 'px';
+    });
   }
 }
 </script>
@@ -58,5 +210,112 @@ html, body{
   flex-flow: column;
   justify-content: center;
   }
+  #cap{
+    position: absolute;
+    left:0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 9998;
+    cursor: none;
+    }
+  #brush{
+    position: absolute;
+    z-index: 9997;
+    background-repeat: repeat-x;
+    color:#000;
+    position: absolute;
+    }
+  #container{
+    flex: 1;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    }
+  #refImg{
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 160px;
+    height: 200px;
+    position: absolute;
+    right: -120px;
+    z-index: 9997;
+    box-sizing: border-box;
+    top: -230px;
+    border: 2px solid;
+    }
+    #middle{
+      position: relative;
+      width: 500px;
+      height: 100%;
+      display: flex;
+      flex-flow: column;
+      align-items: center;
+    }
+  #canvasContainer{
+    width: 442px;
+    position: relative;
+    height: 100%;
+    margin-top: 60px;
+    background-image: url('./assets/canvasBot.png');
+    align-self: center;
+    }
+    #paintCan{
+      background-color:#FFF;
+      position: absolute;
+      }
+    #pallet{
+      background-color: #FFF;
+      position: absolute;
+      bottom: -50px;
+      }
+      .palletCol{
+        min-width: 10px;
+        flex:1;
+        box-sizing: border-box;
+        z-index: 9998;
+        }
 
+    #menu{
+      /* width: 300px; */
+      z-index: 9998;
+      position: relative;
+      background-color:#FFF;
+      border-radius: 0px 0px 20px 20px;
+      border: 2px solid;
+      border-top: none;
+      z-index: 9999;
+      }
+      #menu a{
+        display: inline-block;
+        width: 70px;
+        text-align: center;
+        text-decoration: none;
+        font-weight: bold;
+        color:#000;
+        border-left: 2px solid;
+        padding: 10px 10px;
+        }
+        #menu a:hover{
+          background-color:#000;
+          color: #FFF;
+          }
+        #menu a:first-child{
+          border-radius: 0px 0px 0px 15px;
+          border-left: none;
+          }
+        #menu a:last-child{
+          border-radius: 0px 0px 15px 0px;
+          }
+      #sleeve{
+        width: 100%;
+        box-sizing: border-box;
+        height: 40px;
+        border-top: 3px solid;
+        border-bottom: 3px solid;
+        position: absolute;
+        left: 143px;
+        top: 73px;
+        background-color:#FFF;
+      }
 </style>

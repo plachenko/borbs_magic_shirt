@@ -1,109 +1,75 @@
 <template>
-  <div ref="cont" id="bcan">
-    <input style="position: absolute; top: -30px; width: 500px; z-index: 9999;" max="200" type="range" v-model="animFrame" />
-    <span ref="text" v-show="text.length && textShow" style="width: 370px; font-weight: bold; position: absolute;">{{text}}</span>
-    <div id="toolbar" style="position: absolute; bottom: -20px; right: 0px;">
-      <a href="#" @click="tool = 0">draw</a>
-      <!--
-      <a href="#" @click="addCan">addLayer</a>
-      <input type="number" v-model="canIdx" min="1" :max="cans.length" />
-      -->
-      <a href="#" @click="tool = 1">move</a>
-      <a href="#" @click="tool = 2">text</a>
-      <a href="#" @click="textShow = !textShow">s</a>
-      <a href="#" @click="clearCan">clear</a>
-      <a href="#" @click="$emit('colorEvt')">color</a>
-      <a href="#" @click="sym = !sym">symmetry: {{sym ? "on" : "off"}}</a>
-      <a href="#" @click="save">save</a>
-      <input v-model="text" />
-    </div>
-    <div ref="cap" id="cap" />
-    <canvas v-for="(i, idx) in 3" :key="idx" ref="can" :style="{zIndex: maxZ-idx}" />
+  <div style="position: relative; height: 420px; width: 420px;">
+    <!-- multiple canvases allow for a buffer layer -->
+    <canvas
+      v-for="(can, idx) in 2"
+      :key="idx"
+      width="420"
+      height="420"
+      ref="can" />
   </div>
 </template>
-
 <script>
 export default {
   name: 'BCan',
   data: function(){
     return{
       tool: 0,
-      sym: false,
       speed: 100,
-      maxZ: 9997,
-      textShow: true,
-      cans: [],
       stroke: [],
-      strokeSym: [],
-      canIdx: 1,
-      text: '',
+      strokes: [],
+      frameNum: 0,
+      frameMax: 0,
       frames: [],
-      frame: [],
-      colors: [],
-      gif: null,
-      maxFrame: 9,
-      anim: false,
-      animFrame: 0,
-      curFrame: 0,
-      timer: 0,
-      saving: false,
-      offset: {
-        x: 0,
-        y: 0
-      },
-      i: 0
+      playing: false
     }
   },
   watch:{
-    dim(v){
+    color(v){
+      //
 
-      for(const can of this.$refs.can){
-        can.width = v.w;
-        can.height = v.h;
-      }
     },
-    color(){
-      this.tool = 0;
-    }
-  },
-  props: {
-    color: {
-      type: String,
-      default: "rgb(0,0,0)"
-    },
-    dim: {
-      type: Object,
-      default: function() {
-        return{
-          w:  500,
-          h: 500
+    curPos:{
+      deep: true,
+      handler(v){
+        this.clearCan(1);
+        if(v){
+          this.stroke.push(v);
+          this.draw(1, [this.stroke]);
+        }else{
+          this.strokes.push(this.stroke);
+          this.stroke = [];
         }
       }
     }
   },
-  methods: {
-    addCan(){
-      console.log('adding canvas.');
+  props: {
+    curPos: {
+      type: Object,
+      default: function(){
+        return null;
+      }
     },
-    clearCan(){
-      this.frame = [];
+    color: {
+      type: String,
+      default: "000000"
+    }
+  },
+  methods: {
+    clearAll(){
+      this.frames = [];
+      this.strokes = [];
+      this.clearCan(1);
+    },
+    clearCan(idx){
       this.colors = [];
-      this.clear(this.cans[1]);
+      this.clear(this.$refs.can[idx]);
     },
     clear(can){
-      can.ctx.clearRect(0,0,can.can.width, can.can.height)
-    },
-    move(x= 0, y= 0){
-      this.frame.forEach((stroke) => {
-        this.clear(this.cans[1])
-        stroke.forEach((i)=>{
-          i[0] += x;
-          i[1] += y;
-        })
-      })
+      can.getContext('2d').clearRect(0, 0, can.width, can.height)
     },
     save(){
-      const data = this.cans[1].can.toDataURL();
+      // const data = this.cans[1].can.toDataURL();
       // console.log(data);
       // this.saving = true;
       // this.cans[2].can.width = 5 * 300;
@@ -116,42 +82,49 @@ export default {
       }
       */
     },
-    draw(frame, _idx){
-      const rand = 2;
-      const ctx = this.cans[_idx].ctx
+    draw(idx, strokes){
+      const ctx = this.$refs.can[idx].getContext('2d');
+      strokes.forEach((stroke, i) => {
+        ctx.fillStyle = '#'+this.color;
+        ctx.beginPath();
+        ctx.moveTo(stroke[0].x, strokes[0].y);
 
-      if(frame){
-        frame.forEach((strokes, idx) =>{
-          if(_idx){
-            ctx.fillStyle = this.colors[idx];
-          }else{
-            ctx.fillStyle = this.color;
-          }
+        stroke.forEach((point, i) => {
+          ctx.lineTo(point.x, point.y);
+        })
 
-          ctx.beginPath();
-          ctx.moveTo(strokes[0][0], strokes[0][1]);
-
-          strokes.forEach((stroke,idx) => {
-            ctx.lineTo(stroke[0] + Math.round(Math.random()*rand), stroke[1]+ Math.round(Math.random()*rand));
-          });
-
-          // ctx.closePath();
-          // ctx.fill();
-          ctx.stroke();
-        });
-      }
+        ctx.closePath();
+        ctx.fill();
+        // ctx.stroke();
+      });
     },
     update(){
-      setTimeout(() => {
-        window.requestAnimationFrame(this.update);
-        this.clear(this.cans[1]);
-        this.draw(this.frames[this.animFrame], 1);
-      }, this.speed);
+      this.frames.push(this.strokes);
+
+      if(this.frames[this.frameNum]){
+        this.draw(0, this.frames[this.frameNum]);
+      }
+
+      if(this.playing){
+        this.clearCan(0);
+
+        setTimeout(() => {
+          window.requestAnimationFrame(this.update);
+          if(this.frameNum < this.frameMax){
+            this.frameNum++;
+          }else{
+            this.frameNum = 0;
+          }
+        }, this.speed);
+
+      }
     }
   },
   mounted(){
     this.$nextTick(() => {
+      window.requestAnimationFrame(this.update);
 
+      /*
       const cap = this.$refs.cap.getBoundingClientRect()
 
       this.offset.x = cap.left;
@@ -209,6 +182,7 @@ export default {
             this.stroke.push([e.offsetX - 125, e.offsetY - 125]);
             strokes[0] = this.stroke;
 
+/*
             /*
             let prev = this.stroke[this.timer-1];
             let cur = this.stroke[this.timer];
@@ -217,6 +191,7 @@ export default {
             let dist = Math.sqrt(xDiff + yDiff);
             */
 
+/*
             if(this.sym){
               const x = this.startPosition.x + (this.startPosition.x - e.offsetX);
               this.strokeSym.push([x, e.offsetY]);
@@ -250,7 +225,7 @@ export default {
         }
         });
 
-        window.requestAnimationFrame(this.update);
+        */
 
       });
     }
@@ -259,39 +234,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  #bcan{
-    position: relative;
-  }
-  #cap{
-    position: absolute;
-    left: -25%;
-    top: -25%;
-    width: 150%;
-    height: 150%;
-    z-index: 9998;
-  }
-  canvas{
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    border: 1px solid;
-  }
-  #toolbar input{
-    position: relative;
-    z-index: 9999;
-  }
-  #toolbar a{
-    display: inline-block;
-    position: relative;
-    z-index: 9999;
-    margin: 0px 4px;
-    text-decoration: none;
-    user-select: none;
-    border-left: 1px solid;
-    padding-left: 4px;
-    font-size: 10px !important;
-  }
-  #toolbar a:first-child{
-    border:none;
+canvas{
+  position: absolute;
+  top: 0px;
+  left: 0px;
   }
 </style>
