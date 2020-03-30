@@ -2,9 +2,9 @@
   <div class="container">
     <span id="playBtn" @click="togglePlay">{{playing ? 'stop' : 'play'}}</span>
     <span style="display: inline-block; margin-right: 10px;">frame: {{frameNum}}</span>
-    <input type="range" v-model="frameNum" :max="frameMax">
+    <input style="width: 40px;" type="range" v-model="frameNum" :max="frameMax">
     <span style="display: inline-block; margin:0px 10px;">speed: {{speed / 1000}}</span>
-    <input style="width: 40px;" type="range" v-model="speed" max="1000" min="100" step="100">
+    <input style="width: 40px;" type="range" v-model="speed" max="1000" min="10" step="10">
   </div>
 </template>
 <script>
@@ -13,9 +13,9 @@ export default {
   name: 'BCan',
   data: function(){
     return{
-      speed: 1000,
+      speed: 800,
       frameNum: 0,
-      frameMax: 3,
+      frameMax: 9,
       playing: false
     }
   },

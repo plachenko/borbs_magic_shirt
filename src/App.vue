@@ -17,9 +17,9 @@
           <a href="#" @click="save">Save</a>
           <a href="#" @click="$refs.paintCan.clearAll()">Clear</a>
           <a href="#" @click="timelineShow = !timelineShow">Timeline</a>
-          <a href="#" @click="camera">Camera</a>
+          <!-- <a href="#" @click="camera">Camera</a> -->
           <input type="file" ref="file" @change="load" style="display:none" />
-          <a href="#" @click="$refs.file.click()">Load</a>
+          <a href="#" @click="$refs.file.click()" style="border-radius: 0px 0px 15px 0px">Load</a>
           <BTimeline v-show="timelineShow" />
         </div>
 
@@ -388,9 +388,6 @@ html, body{
         #menu a:first-child{
           border-radius: 0px 0px 0px 15px;
           border-left: none;
-          }
-        #menu a:last-child{
-          border-radius: 0px 0px 15px 0px;
           }
       #sleeve{
         width: 100%;
