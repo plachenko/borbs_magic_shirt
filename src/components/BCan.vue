@@ -28,12 +28,28 @@ export default {
       deep: true,
       handler(points){
         this.clearCan(1);
-        this.strokes = {stroke: this.stroke, lineColor: this.lineColor, color: this.color};
-
         if(this.color || this.lineColor){
+          if(points){
+            this.stroke.push(points);
+            this.strokes = {stroke: this.stroke, lineColor: this.lineColor, color: this.color};
+
+            this.draw(1, [this.strokes]);
+          }else{
+            this.strokes = {stroke: this.stroke, lineColor: this.lineColor, color: this.color};
+            this.stroke = []
+            if(this.frames[this.frameNum]){
+              this.frames[this.frameNum].push([this.strokes]);
+            }else{
+              this.frames[this.frameNum] = [this.strokes];
+            }
+
+            this.drawFrame(this.frameNum);
+          }
+        }
+        /*
+
           this.stroke.push(v);
           this.draw(1, this.strokes);
-          /*
           if(points){
             if(this.frameEvt){
               this.stroke = [];
@@ -58,7 +74,6 @@ export default {
             this.stroke = [];
             this.drawFrame(this.frameNum);
           }
-          */
           }else{
             if(this.frames[this.frameNum] && this.reset){
               this.frames[this.frameNum].push(this.strokes)
@@ -70,6 +85,7 @@ export default {
             this.stroke = [];
           }
         }
+          */
         /*
         this.clearCan(1);
         if(this.color || this.lineColor){
@@ -181,25 +197,20 @@ export default {
 
       if(_idx == 0){
         this.clearCan(0);
-        // console.log(strokes);
       }
 
-      this.drawStroke(ctx, _idx, strokes.stroke, strokes.color, strokes.lineColor);
-      // strokes.forEach((_stroke, idx) => {
-        // console.log(_stroke.stroke);
-      // });
+      console.log(strokes);
+
+      strokes.forEach((_stroke, idx) => {
+        this.drawStroke(ctx, _idx, _stroke.stroke, _stroke.color, _stroke.lineColor);
+      });
     },
     drawFrame(n){
       if(this.frames[n]){
-        /*
         this.frames[n].forEach((_stroke) => {
-          console.log(_stroke);
-          this.draw(0, [_stroke]);
+          this.draw(0, _stroke);
         })
-        */
-       this.draw(0, this.frames[n])
       }
-      // console.log(this.frames[n]);
     },
     frameChange(v){
       this.frameNum = v;
