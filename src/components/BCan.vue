@@ -28,7 +28,12 @@ export default {
       deep: true,
       handler(points){
         this.clearCan(1);
+        this.strokes = {stroke: this.stroke, lineColor: this.lineColor, color: this.color};
+
         if(this.color || this.lineColor){
+          this.stroke.push(v);
+          this.draw(1, this.strokes);
+          /*
           if(points){
             if(this.frameEvt){
               this.stroke = [];
@@ -36,10 +41,9 @@ export default {
               this.frameEvt = false;
             }
             this.stroke.push(points);
+            */
             // if there are values in the pointer down push them into stroke...
-            // this.stroke.push(v);
 
-            // this.strokes = {stroke: this.stroke, lineColor: this.lineColor, color: this.color};
 
           /*
             if(this.frames[this.frameNum] && this.reset){
@@ -49,7 +53,6 @@ export default {
               this.reset = false;
             }
 
-            this.draw(1, this.strokes);
           }else{
             this.reset = true;
             this.stroke = [];
@@ -57,6 +60,13 @@ export default {
           }
           */
           }else{
+            if(this.frames[this.frameNum] && this.reset){
+              this.frames[this.frameNum].push(this.strokes)
+            } else {
+              this.frames[this.frameNum] = [this.strokes];
+              this.reset = false;
+            }
+            this.drawFrame(this.frameNum);
             this.stroke = [];
           }
         }

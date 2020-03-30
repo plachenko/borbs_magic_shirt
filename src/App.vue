@@ -77,12 +77,12 @@ export default {
   data: function(){
     return{
       coloring: false,
-      // color: "000000",
-      // color: "000000",
-      color: null,
-      lineColor: "000000",
+      color: "000000",
+      // color: null,
+      // lineColor: "000000",
+      lineColor: null,
       selected: 'bg',
-      timelineShow: true,
+      timelineShow: false,
       palletShow: false,
       refOpen: false,
       curPos: null,
@@ -141,7 +141,7 @@ export default {
       this.selected = 'line';
     },
     save(){
-      console.log('saving.');
+      //
     },
     camera(){
       if (navigator.mediaDevices.getUserMedia) {
@@ -150,7 +150,7 @@ export default {
           // video.srcObject = stream;
         })
         .catch(function (err) {
-          console.log("Something went wrong!");
+          //
         });
       }
     },
