@@ -4,7 +4,7 @@
     <span style="display: inline-block; margin-right: 10px;">frame: {{frameNum}}</span>
     <input style="width: 40px;" type="range" v-model="frameNum" :max="frameMax">
     <span style="display: inline-block; margin:0px 10px;">speed: {{speed / 1000}}</span>
-    <input style="width: 40px;" type="range" v-model="speed" max="1000" min="10" step="10">
+    <input style="width: 40px;" type="range" v-model="speed" max="1000" min="100" step="100">
   </div>
 </template>
 <script>
@@ -13,9 +13,9 @@ export default {
   name: 'BCan',
   data: function(){
     return{
-      speed: 800,
+      speed: 1000,
       frameNum: 0,
-      frameMax: 9,
+      frameMax: 3,
       playing: false
     }
   },
@@ -48,6 +48,12 @@ export default {
     }
   },
   mounted(){
+    document.addEventListener('keydown', (e)=>{
+      if(e.which == 32){
+        this.togglePlay();
+      }
+    });
+
     this.$nextTick(() => {
       this.startTick();
     });

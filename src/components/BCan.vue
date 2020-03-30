@@ -13,120 +13,6 @@
 import EventBus from '../Eventbus';
 export default {
   name: 'BCan',
-  data: function(){
-    return{
-      stroke: [],
-      strokes: [],
-      frames: [],
-      firstPnt: null,
-      frameNum: 0,
-      frameEvt: false
-    }
-  },
-  watch:{
-    curPos:{
-      deep: true,
-      handler(points){
-        this.clearCan(1);
-        if(this.color || this.lineColor){
-          if(points){
-            this.stroke.push(points);
-            this.strokes = {stroke: this.stroke, lineColor: this.lineColor, color: this.color};
-
-            this.draw(1, [this.strokes]);
-          }else{
-            this.strokes = {stroke: this.stroke, lineColor: this.lineColor, color: this.color};
-            this.stroke = []
-            if(this.frames[this.frameNum]){
-              this.frames[this.frameNum].push([this.strokes]);
-            }else{
-              this.frames[this.frameNum] = [this.strokes];
-            }
-
-            this.drawFrame(this.frameNum);
-          }
-        }
-        /*
-
-          this.stroke.push(v);
-          this.draw(1, this.strokes);
-          if(points){
-            if(this.frameEvt){
-              this.stroke = [];
-              console.log(this.stroke);
-              this.frameEvt = false;
-            }
-            this.stroke.push(points);
-            */
-            // if there are values in the pointer down push them into stroke...
-
-
-          /*
-            if(this.frames[this.frameNum] && this.reset){
-              this.frames[this.frameNum].push(this.strokes)
-            } else {
-              this.frames[this.frameNum] = [this.strokes];
-              this.reset = false;
-            }
-
-          }else{
-            this.reset = true;
-            this.stroke = [];
-            this.drawFrame(this.frameNum);
-          }
-          }else{
-            if(this.frames[this.frameNum] && this.reset){
-              this.frames[this.frameNum].push(this.strokes)
-            } else {
-              this.frames[this.frameNum] = [this.strokes];
-              this.reset = false;
-            }
-            this.drawFrame(this.frameNum);
-            this.stroke = [];
-          }
-        }
-          */
-        /*
-        this.clearCan(1);
-        if(this.color || this.lineColor){
-          if(v){
-            this.stroke.push(v);
-            this.strokes = {stroke: this.stroke, lineColor: this.lineColor, color: this.color};
-            // console.log(strokes);
-            // this.clearCan(1);
-            // strokes.stroke.push(v)
-            // this.stroke.push(v);
-            this.draw(1, [this.strokes]);
-            if(this.frames[this.frameNum]){
-              this.frames[this.frameNum].push(this.strokes);
-              // console.log(this.frames[this.frameNum]);
-              // console.log('in', this.frames[this.frameNum][0].stroke);
-              // this.frames[this.frameNum][0].stroke.push(v);
-              // this.frames[this.frameNum].push(this.strokes);
-              // this.frames[this.frameNum].push(this.stroke)
-            }else{
-              //
-              // console.log('none');
-              this.frames[this.frameNum] = [this.strokes];
-            }
-
-            // this.frameNum++;
-          }else{
-            // this.stroke = [];
-            // this.drawFrame(this.frameNum);
-            // if(this.frames[this.frameNum]){
-              // this.frames[this.frameNum].push(strokes);
-              // this.draw(0, this.frames[this.frameNum]);
-            // } else {
-              // this.frames[this.frameNum] = [strokes]
-              // this.draw(0, this.frames[this.frameNum]);
-            // }
-          }
-        }
-        */
-      }
-    }
-  },
   props: {
     curPos: {
       type: Object,
@@ -143,23 +29,83 @@ export default {
       default: "000000"
     }
   },
+  data: function(){
+    return{
+      points: [],
+      stroke: [],
+      frame: [],
+      frameNum: 0,
+    }
+  },
+  watch:{
+    curPos:{
+      deep: true,
+      handler(point){
+        this.clear(1);
+        if(this.color || this.lineColor){
+          this.stroke = {points: [], lineColor: this.lineColor, color: this.color}
+          if(point){
+
+            if(this.points[this.frameNum]){
+              this.points[this.frameNum].push(point);
+            }else{
+              this.points[this.frameNum] = [point];
+            }
+
+            this.stroke.points = this.points;
+            // console.log(this.stroke.points);
+            this.stroke.points.forEach((pnt) => {
+              pnt.forEach((p) => {
+                this.$refs.can[1].getContext('2d').fillRect(p.x, p.y, 10, 10);
+                // console.log(p.x);
+              })
+              // console.log(pnt);
+            })
+
+            // this.drawStroke(1, this.stroke.points[this.frameNum], this.color, this.lineColor);
+            // this.stroke.push({points: this.points, color: this.color, lineColor: this.lineColor});
+          }else{
+            // pointer up.
+            // this.drawStroke(0, this.points, this.color, this.lineColor);
+            // console.log(this.stroke.points[this.frameNum]);
+            this.drawStroke(0, this.stroke.points[this.frameNum], this.color, this.lineColor);
+            this.points = [];
+          }
+        }
+      }
+    }
+  },
   methods: {
     clearAll(){
       this.frames = [];
       this.strokes = [];
-      this.clearCan(0);
+
+      for(const i in this.$refs.can){
+        this.clear(i);
+      }
     },
-    clearCan(idx){
-      this.colors = [];
-      this.clear(this.$refs.can[idx]);
-    },
-    clear(can){
+    clear(idx){
+      // console.log('clearing.', idx);
+      const can = this.$refs.can[idx];
       can.getContext('2d').clearRect(0, 0, can.width, can.height)
     },
     save(){
       //
     },
-    drawStroke(ctx, idx, path, col, lCol){
+    drawFrame(n){
+      if(this.frames[n]){
+        this.frames[n].forEach((_stroke) => {
+          this.draw(0, _stroke);
+        })
+      }
+    },
+    drawStroke(idx, path, col, lCol){
+      const ctx = this.$refs.can[idx].getContext('2d');
+      if(!idx){
+        console.log(ctx);
+
+      }
+
       if(lCol){
         ctx.strokeStyle = '#'+lCol;
       }
@@ -168,9 +114,11 @@ export default {
         ctx.fillStyle = '#'+col;
       }
 
+      /*
       if(idx == 1){
         ctx.globalCompositeOperation = 'xor';
       }
+      */
 
       if(path){
         ctx.beginPath();
@@ -196,41 +144,34 @@ export default {
       const ctx = this.$refs.can[_idx].getContext('2d');
 
       if(_idx == 0){
-        this.clearCan(0);
+        this.clear(0);
       }
 
-      console.log(strokes);
+      // console.log(strokes);
 
       strokes.forEach((_stroke, idx) => {
         this.drawStroke(ctx, _idx, _stroke.stroke, _stroke.color, _stroke.lineColor);
       });
     },
-    drawFrame(n){
-      if(this.frames[n]){
-        this.frames[n].forEach((_stroke) => {
-          this.draw(0, _stroke);
-        })
-      }
-    },
     frameChange(v){
+      this.clearAll();
       this.frameNum = v;
-      this.clearCan(0);
-      this.clearCan(1);
-      // this.stroke = [];
-      this.drawFrame(v);
-      this.frameEvt = true;
+      this.drawStroke(0, this.stroke.points[this.frameNum], this.color, this.lineColor);
 
-      // if(this.frames[this.frameNum]){
-        // this.stroke = this.frames[this.frameNum].strokes;
-        // this.frames[this.frameNum].forEach((_stroke) => {
-          // this.draw(0, _stroke);
-          // _stroke.stroke.forEach((_intern) => {
-            // this.$refs.can[0].getContext('2d').fillRect(_intern.x,_intern.y,20,20);
-          // })
-        // })
-        // console.log(this.frames[this.frameNum]);
-        // this.draw(0, this.frames[this.frameNum]);
-      // }
+      if(this.points.length){
+        let pt
+        if(v){
+          pt = this.points[this.frameNum-1][this.points];
+        }else{
+          pt = this.points[this.frameNum][this.points];
+        }
+
+        if(this.points[this.frameNum]){
+          this.points[this.frameNum].push(pt);
+        }else{
+          this.points[this.frameNum] = pt;
+        }
+      }
     }
   },
   mounted(){

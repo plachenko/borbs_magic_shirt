@@ -82,7 +82,7 @@ export default {
       // lineColor: "000000",
       lineColor: null,
       selected: 'bg',
-      timelineShow: false,
+      timelineShow: true,
       palletShow: false,
       refOpen: false,
       curPos: null,
@@ -134,6 +134,7 @@ export default {
       if(this.selected == 'line'){
         if(this.lineColor){
           this.lineColor = null;
+          console.log('test')
         }else{
           this.lineColor = "000000";
         }
@@ -248,12 +249,12 @@ export default {
         this.md = false;
       }
 
-      if(e.offsetY > window.innerHeight - 80 && !this.palletShow){
+      if(e.offsetY > window.innerHeight - window.innerHeight/9 && !this.palletShow){
         this.palletShow = true;
         gsap.to('#pallet', {bottom: -5})
         top = e.offsetY - 45;
         this.$refs.brush.style.transform = "scaleY(-1)"
-      } else if(e.offsetY < window.innerHeight - 79){
+      } else if(e.offsetY < window.innerHeight - window.innerHeight/9){
         gsap.to('#pallet', {bottom: -65})
         top = e.offsetY
         this.$refs.brush.style.transform = "scaleY(1)"
