@@ -1,10 +1,12 @@
 <template>
   <div class="container">
     <span id="playBtn" @click="togglePlay">{{playing ? 'stop' : 'play'}}</span>
+    <span style="display: inline-block; margin-right: 10px;">Max:</span>
+    <input type="number" style="width: 30px; margin-right: 10px;" v-model="frameMax" />
     <span style="display: inline-block; margin-right: 10px;">frame: {{frameNum}}</span>
     <input style="width: 40px;" type="range" v-model="frameNum" :max="frameMax">
-    <span style="display: inline-block; margin:0px 10px;">speed: {{speed / 1000}}</span>
-    <input style="width: 40px;" type="range" v-model="speed" max="1000" min="100" step="100">
+    <span style="display: inline-block; margin:0px 10px;">speed: {{speed / 1000}}s</span>
+    <input style="width: 40px;" type="range" v-model="speed" max="1000" min="10" step="10">
   </div>
 </template>
 <script>
@@ -13,7 +15,7 @@ export default {
   name: 'BCan',
   data: function(){
     return{
-      speed: 1000,
+      speed: 30,
       frameNum: 0,
       frameMax: 3,
       playing: false
@@ -65,7 +67,8 @@ export default {
   box-sizing: border-box;
   position: absolute;
   bottom: -70px;
-  width: 100%;
+  width: 130%;
+  left:-15%;
   border: 2px solid;
   padding: 10px;
   background-color:#FFF;
