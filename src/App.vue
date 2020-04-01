@@ -3,7 +3,7 @@
 
     <div ref="cap" id="cap" />
     <div ref="brush" id="brush">
-      <canvas :class="{disabled: !color}" v-show="color" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9994;"/>
+      <canvas :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9994;"/>
       <img :class="{disabled: !color}" ref="tipBG" style="left: 0px; position: absolute;z-index: 9993;" src="./assets/tip.png" id="tip" />
       <img src="./assets/brush.png" style="left: 20px; position: absolute;" />
       <div id="sleeve" />
@@ -111,16 +111,27 @@ export default {
     }
   },
   watch:{
-    color(v){
-      this.tipChange();
+    color:{
+      deep:true,
+      handler(){
+        this.tipChange();
+      }
     }
   },
   methods:{
     changeColor(val){
       if(this.selected == 'bg'){
-        this.color.mix(val);
+        if(this.color){
+          this.color.mix(val);
+        }else{
+          this.color = val;
+        }
       } else if(this.selected == 'line'){
-        this.lineColor.mix(val);
+        if(this.lineColor){
+          this.lineColor.mix(val);
+        }else{
+          this.lineColor = val;
+        }
       }
     },
     toggleColor(){
@@ -168,7 +179,7 @@ export default {
       for(let i = 0; i <= tLine.frameMax; i++){
         canRef.frameChange(i);
         img = canLyr.getContext('2d').getImageData(30,55,420,420);
-        renderCan.getContext('2d').fillStyle = "#FCF";
+        renderCan.getContext('2d').fillStyle = "#FFF";
         renderCan.getContext('2d').fillRect(0, 0, 420, 420);
         renderCan.getContext('2d').putImageData(img, 0, 0);
         gif.addFrame(renderCan, {copy: true, delay: tLine.speed*1.5});
@@ -212,7 +223,7 @@ export default {
     tipChange(){
       const ctx = this.$refs.tip.getContext('2d');
       ctx.drawImage(this.tipImg, 0, 0);
-      ctx.fillStyle = "#"+ this.color.hex;
+      ctx.fillStyle = this.color ? "#"+this.color.hex : "";
 
       ctx.globalCompositeOperation = "source-in";
       ctx.fillRect(0,0,14,14);
