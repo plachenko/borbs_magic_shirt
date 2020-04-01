@@ -11,7 +11,6 @@
 </template>
 <script>
 import EventBus from '../Eventbus';
-import Frame from '../classes/Frame';
 export default {
   name: 'BCan',
   props: {

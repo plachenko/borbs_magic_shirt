@@ -13,10 +13,6 @@ export default class Color{
     return "#" + this.componentToHex(this.red) + this.componentToHex(this.green) + this.componentToHex(this.blue);
   }
 
-  set hex(){
-
-  }
-
   public hexToRgb(){
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(this.hex);
     return result ? {

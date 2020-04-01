@@ -82,7 +82,7 @@ export default {
       // lineColor: "000000",
       lineColor: null,
       selected: 'bg',
-      timelineShow: true,
+      timelineShow: false,
       palletShow: false,
       refOpen: false,
       curPos: null,
@@ -134,7 +134,6 @@ export default {
       if(this.selected == 'line'){
         if(this.lineColor){
           this.lineColor = null;
-          console.log('test')
         }else{
           this.lineColor = "000000";
         }
