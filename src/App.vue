@@ -212,7 +212,7 @@ export default {
     tipChange(){
       const ctx = this.$refs.tip.getContext('2d');
       ctx.drawImage(this.tipImg, 0, 0);
-      ctx.fillStyle = "#"+ this.color;
+      ctx.fillStyle = "#"+ this.color.hex;
 
       ctx.globalCompositeOperation = "source-in";
       ctx.fillRect(0,0,14,14);
