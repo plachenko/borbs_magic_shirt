@@ -4,6 +4,7 @@
     <div ref="cap" id="cap" />
     <div ref="brush" id="brush">
       <canvas :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9994;"/>
+      <canvas id="lineTip" :style="{opacity: !lineColor ? 0 : 1}" width="26" height="19" ref="linetip" style="left: -2px; position: absolute; z-index:9993;"/>
       <img :class="{disabled: !color}" ref="tipBG" style="left: 0px; position: absolute;z-index: 9993;" src="./assets/tip.png" id="tip" />
       <img src="./assets/brush.png" style="left: 20px; position: absolute;" />
       <div id="sleeve" />
@@ -116,6 +117,12 @@ export default {
       handler(){
         this.tipChange();
       }
+    },
+    lineColor:{
+      deep:true,
+      handler(){
+        this.tipChange();
+      }
     }
   },
   methods:{
@@ -221,6 +228,13 @@ export default {
       this.refOpen = true;
     },
     tipChange(){
+      const ctxt = this.$refs.linetip.getContext('2d');
+      ctxt.drawImage(this.tipImg, 0, 0);
+      ctxt.fillStyle = this.lineColor ? "#"+this.lineColor.hex : "";
+
+      ctxt.globalCompositeOperation = "source-in";
+      ctxt.fillRect(0,0,14,14);
+
       const ctx = this.$refs.tip.getContext('2d');
       ctx.drawImage(this.tipImg, 0, 0);
       ctx.fillStyle = this.color ? "#"+this.color.hex : "";
@@ -279,6 +293,10 @@ export default {
           this.$refs.tipBG.style.left = "6px";
           this.$refs.tipBG.style.transform = "scaleX(-1) rotate(90deg)";
 
+          this.$refs.linetip.style.top = "-7px";
+          this.$refs.linetip.style.left = "5px";
+          this.$refs.linetip.style.transform = "scaleX(-1) rotate(90deg)";
+
           this.$refs.tip.style.top = "-4px";
           this.$refs.tip.style.left = "6px";
           this.$refs.tip.style.transform = "scaleX(-1) rotate(90deg)";
@@ -287,6 +305,10 @@ export default {
           this.$refs.tipBG.style.top = "0px";
           this.$refs.tipBG.style.left = "0px";
           this.$refs.tipBG.style.transform = "rotate(0deg)";
+
+          this.$refs.linetip.style.top = "-1px";
+          this.$refs.linetip.style.left = "-4px";
+          this.$refs.linetip.style.transform = "rotate(0deg)";
 
           this.$refs.tip.style.top = "0px";
           this.$refs.tip.style.left = "0px";
@@ -473,5 +495,8 @@ html, body{
         }
         .disabled{
           opacity: .2;
+        }
+        #lineTip .disabled{
+          opacity: 0 !important;
         }
 </style>
