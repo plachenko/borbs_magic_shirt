@@ -3,9 +3,9 @@
 
     <div ref="cap" id="cap" />
     <div ref="brush" id="brush">
-      <canvas width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9994;"/>
-      <img ref="tipBG" style="left: 0px; position: absolute;z-index: 9993;" src="./assets/tip.png" id="tip" />
-      <img src="./assets/brush.png" style="left: 25px; position: absolute;" />
+      <canvas :class="{disabled: !color}" v-show="color" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9994;"/>
+      <img :class="{disabled: !color}" ref="tipBG" style="left: 0px; position: absolute;z-index: 9993;" src="./assets/tip.png" id="tip" />
+      <img src="./assets/brush.png" style="left: 20px; position: absolute;" />
       <div id="sleeve" />
     </div>
 
@@ -459,5 +459,8 @@ html, body{
           color:#F00;
           margin-top: 5px;
           font-size: 40px;
+        }
+        .disabled{
+          opacity: .2;
         }
 </style>
