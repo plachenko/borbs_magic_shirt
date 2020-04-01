@@ -90,6 +90,10 @@ export default {
       can.getContext('2d').clearRect(0, 0, can.width, can.height)
     },
     drawStrokes(){
+      const underCan = this.$refs.can[0].getContext('2d');
+      underCan.fillStyle = "#FFF";
+      underCan.fillRect(0,0,this.$refs.can[0].width, this.$refs.can[0].height);
+
       this.strokes.forEach((stroke)=>{
         if(stroke.points[this.frameN]){
           this.draw(0, stroke.points[this.frameN], stroke.col, stroke.lCol);
@@ -102,11 +106,16 @@ export default {
         this.clear(1);
       }
 
+
       ctx.beginPath();
       ctx.moveTo(path[0].x, path[0].y);
       path.forEach((point, i) => {
         ctx.lineTo(point.x, point.y);
       });
+
+      // if(this.points){
+      //   ctx.lineTo(this.points[this.points.length-1].x, this.points[this.points.length-1].y)
+      // }
 
       if(col){
         ctx.fillStyle = '#' + col;

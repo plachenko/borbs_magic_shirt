@@ -1,8 +1,9 @@
 <template>
   <div class="container">
-    <span id="playBtn" @click="togglePlay">{{playing ? 'stop' : 'play'}}</span>
+    <span id="playBtn" v-if="!rec" @click="togglePlay">{{playing ? 'stop' : 'play'}}</span>
+    <span id="recBtn" v-if="!playing" :class="{recording: rec}" @click="toggleRec">Rec</span>
     <span style="display: inline-block; margin-right: 10px;">Max:</span>
-    <input type="number" style="width: 30px; margin-right: 10px;" v-model="frameMax" />
+    <input type="number" style="width: 30px; margin-right: 10px;" min="0" v-model="frameMax" />
     <span style="display: inline-block; margin-right: 10px;">frame: {{frameNum}}</span>
     <input style="width: 40px;" type="range" v-model="frameNum" :max="frameMax">
     <span style="display: inline-block; margin:0px 10px;">speed: {{speed / 1000}}s</span>
@@ -13,34 +14,67 @@
 import EventBus from '../Eventbus';
 export default {
   name: 'BCan',
+  props: {
+    curPos: {
+      type: Object,
+      default: function(){
+        return null;
+      }
+    }
+  },
   data: function(){
     return{
-      speed: 30,
+      speed: 60,
       frameNum: 0,
       frameMax: 3,
+      rec: false,
       playing: false
     }
   },
   watch:{
+    curPos(pnt){
+      if(this.rec){
+        if(pnt){
+          this.addFrame();
+        }else{
+          this.frameNum = 0;
+        }
+      }
+    },
     frameNum(v){
       EventBus.$emit('frameChange', v);
     }
   },
   methods:{
+    addFrame(){
+      if(this.frameNum < this.frameMax){
+        this.frameNum++;
+      }else{
+        if(this.rec){
+          this.frameMax++;
+        }else{
+          this.frameNum = 0;
+        }
+      }
+    },
     tick(){
       setTimeout(() => {
         if(this.playing){
           window.requestAnimationFrame(this.tick);
-          if(this.frameNum < this.frameMax){
-            this.frameNum++;
-          }else{
-            this.frameNum = 0;
-          }
+          this.addFrame();
         }
       }, this.speed);
     },
+    toggleRec(){
+      this.rec = !this.rec;
+    },
     togglePlay(){
-      this.playing = !this.playing;
+      if(this.rec){
+        this.rec = false;
+      }else{
+        this.playing = !this.playing;
+      }
+
       if(this.playing){
         this.startTick();
       }
@@ -67,12 +101,27 @@ export default {
   box-sizing: border-box;
   position: absolute;
   bottom: -70px;
-  width: 130%;
-  left:-15%;
+  width: 140%;
+  left:-20%;
   border: 2px solid;
   padding: 10px;
   background-color:#FFF;
 }
+.recording{
+  color:#FFF;
+  background-color:#F00;
+}
+#recBtn{
+  display: inline-block;
+  border: 2px solid;
+  margin-right: 10px;
+  padding: 5px;
+  cursor: pointer;
+  }
+  #recBtn:hover{
+    background-color: #F00;
+    color: #FFF;
+  }
 #playBtn{
   display: inline-block;
   border: 2px solid;
@@ -81,7 +130,7 @@ export default {
   cursor: pointer;
   }
   #playBtn:hover{
-    background: #000;
+    background-color: #000;
     color: #FFF;
   }
 </style>
