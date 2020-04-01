@@ -25,14 +25,14 @@
 
         <div id="canvasContainer" ref="canContainer">
           <img style="position: absolute; z-index: 9995;" src="./assets/canvas.png" />
-          <BCan ref="paintCan" id="paintCan" :lineColor="lineColor" :curPos="curPos" :color="color" />
+          <BCan ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
         </div>
         <div id="pallet" >
           <div @click="toggleColor" style="z-index: 9998; position: absolute; top: -5px; left: -100px;">
             Fill
             <div :class="{cur: selected == 'bg'}" class="colPrev">
               <span v-show="!color" class="X">X</span>
-              <div :style="{backgroundColor: '#'+color}" />
+              <div :style="{backgroundColor: color ? '#'+color.hex : '#FFF'}" />
             </div>
           </div>
 
@@ -40,7 +40,7 @@
             Stroke
             <div :class="{cur: selected == 'line'}" class="colPrev">
               <span v-show="!lineColor" class="X">X</span>
-              <div :style="{backgroundColor: '#'+lineColor}" />
+              <div :style="{backgroundColor: lineColor ? '#'+lineColor.hex : '#FFF'}" />
             </div>
           </div>
 
@@ -65,8 +65,8 @@
 <script>
 import BCan from './components/BCan';
 import BTimeline from './components/BTimeline';
-// import BColor from './components/BColor';
 import gsap from 'gsap';
+import Color from './classes/Color';
 
 // eslint-disable-next-line
 import GIF from './assets/js/gif.js';
@@ -82,7 +82,7 @@ export default {
   data: function(){
     return{
       coloring: false,
-      color: "000000",
+      color: new Color('000000'),
       lineColor: null,
       selected: 'bg',
       timelineShow: false,
@@ -93,20 +93,20 @@ export default {
       tipImg: null,
       armShow: true,
       colors:[
-        '000000',
-        'FFFFFF',
-        'F2B7D6',
-        'E91D3B',
-        'FDBC24',
-        '45B5F1',
-        'A776EE',
-        '58E8A4',
-        '162770',
-        '5A2F1C',
-        'F7EB3D',
-        'C7C6C7',
-        '115011',
-        '380E74'
+        new Color('000000'),
+        new Color('FFFFFF'),
+        new Color('F2B7D6'),
+        new Color('E91D3B'),
+        new Color('FDBC24'),
+        new Color('45B5F1'),
+        new Color('A776EE'),
+        new Color('58E8A4'),
+        new Color('162770'),
+        new Color('5A2F1C'),
+        new Color('F7EB3D'),
+        new Color('C7C6C7'),
+        new Color('115011'),
+        new Color('380E74')
       ]
     }
   },
@@ -118,9 +118,9 @@ export default {
   methods:{
     changeColor(val){
       if(this.selected == 'bg'){
-        this.color = val;
+        this.color.mix(val);
       } else if(this.selected == 'line'){
-        this.lineColor = val;
+        this.lineColor.mix(val);
       }
     },
     toggleColor(){
@@ -128,7 +128,7 @@ export default {
         if(this.color){
           this.color = null;
         }else{
-          this.color = "000000";
+          this.color = new Color("000000");
         }
       }
       this.selected = 'bg';
@@ -138,7 +138,7 @@ export default {
         if(this.lineColor){
           this.lineColor = null;
         }else{
-          this.lineColor = "000000";
+          this.lineColor = new Color("000000");
         }
       }
       this.selected = 'line';
