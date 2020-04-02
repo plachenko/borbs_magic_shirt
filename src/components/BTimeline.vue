@@ -45,6 +45,9 @@ export default {
     },
     frameNum(v){
       EventBus.$emit('frameChange', v);
+    },
+    frameMax(v){
+      EventBus.$emit('frameMax', v);
     }
   },
   methods:{

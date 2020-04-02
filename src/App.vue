@@ -79,6 +79,7 @@ import Color from './classes/Color';
 // eslint-disable-next-line
 import GIF from './assets/js/gif.js';
 import WorkerGIF from 'raw-loader!./assets/js/gif.worker.js';
+import EventBus from './Eventbus';
 
 export default {
   name: 'App',
@@ -89,13 +90,14 @@ export default {
   },
   data: function(){
     return{
+      maxFrameArr: [],
       curCan: 1,
       canNum: 1,
       coloring: false,
       color: new Color('000000'),
       lineColor: null,
       selected: 'bg',
-      timelineShow: false,
+      timelineShow: true,
       palletShow: false,
       refOpen: false,
       curPos: null,
@@ -135,16 +137,14 @@ export default {
     }
   },
   methods:{
+    frameMaxChange(v){
+      this.maxFrameArr[this.curCan-1] = parseInt(v);
+    },
     setCan(num, idx){
       if((num + this.curCan) > this.canNum){
         this.canNum++;
       }
       this.curCan += num;
-
-      let totFrames = 4;
-      if(this.$refs.paintCan[this.curCan-1]){
-        totFrames = this.$refs.timeline.frameMax = this.$refs.paintCan[this.curCan-1].totFrames;
-      }
 
       this.$refs.paintCan.forEach((e,idx) => {
         if(this.curCan - 1 !== idx){
@@ -152,9 +152,14 @@ export default {
         }else{
           gsap.to(e.$el, .4, {autoAlpha: 1});
         }
+        const maxFrame = this.maxFrameArr[this.curCan-1] >= 0 ? this.maxFrameArr[this.curCan-1] : -1 ;
         gsap.to(e.$el, {right: "+=" + num*420, onComplete: () => {
           this.$refs.timeline.frameNum = 0;
-          this.$refs.timeline.frameMax = totFrames;
+          if(this.maxFrameArr[this.curCan-1] >= 0){
+            this.$refs.timeline.frameMax = this.maxFrameArr[this.curCan-1];
+          }else{
+            this.$refs.timeline.frameMax = 3;
+          }
         }});
       });
     },
@@ -286,6 +291,8 @@ export default {
       this.$refs.canContainer.style.marginTop = (window.innerHeight/2) - 250  + "px";
       paintPos = this.$refs.paintCan[this.curCan-1].$el.getBoundingClientRect()
     });
+
+    EventBus.$on('frameMax', this.frameMaxChange);
 
     this.$refs.pallet.addEventListener('pointerdown', (e) => {
       this.$refs.brush.style.bottom = 40 + 'px';
