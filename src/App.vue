@@ -28,13 +28,12 @@
         <div id="canvasContainer" ref="canContainer">
 
           <div style="position: absolute; left: -180px; top: 140px;width: 800px; height: 100px;">
-            <div style="left: 30px;" v-if="curCan > 1" class="canBtn" @click="setCan(-1)">&lt;</div>
-            <div style="right: 30px;" class="canBtn" @click="setCan(1)">&gt;</div>
+            <div style="left: 30px;" v-if="curCan > 1" class="canBtn" @click="setCan(-1, curCan)">&lt;</div>
+            <div style="right: 30px;" class="canBtn" @click="setCan(1, curCan)">&gt;</div>
           </div>
 
           <img style="position: absolute; z-index: 9995;" src="./assets/canvas.png" />
-          {{canNum}}
-          <BCan class="bCanvases"  v-for="(c, i) in canNum" :current="i == curCan-1" :style="{right: -1 * ((i+1) * 420)+'px'}" :key="i" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
+          <BCan class="bCanvases" v-for="(c, i) in canNum" :current="i == curCan-1" :key="i" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
         </div>
         <div id="pallet" >
           <div @click="toggleColor" style="z-index: 9998; position: absolute; top: -5px; left: -100px;">
@@ -136,15 +135,28 @@ export default {
     }
   },
   methods:{
-    setCan(num){
-      const offset = (num  * 420);
-      console.log(offset);
-      gsap.to('.bCanvases', {right: "+=" + offset})
+    setCan(num, idx){
       if((num + this.curCan) > this.canNum){
         this.canNum++;
       }
-      console.log(this.canNum);
       this.curCan += num;
+
+      let totFrames = 4;
+      if(this.$refs.paintCan[this.curCan-1]){
+        totFrames = this.$refs.timeline.frameMax = this.$refs.paintCan[this.curCan-1].totFrames;
+      }
+
+      this.$refs.paintCan.forEach((e,idx) => {
+        if(this.curCan - 1 !== idx){
+          gsap.to(e.$el, .4, {autoAlpha: 0});
+        }else{
+          gsap.to(e.$el, .4, {autoAlpha: 1});
+        }
+        gsap.to(e.$el, {right: "+=" + num*420, onComplete: () => {
+          this.$refs.timeline.frameNum = 0;
+          this.$refs.timeline.frameMax = totFrames;
+        }});
+      });
     },
     changeColor(val){
       if(this.selected == 'bg'){

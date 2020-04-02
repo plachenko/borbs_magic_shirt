@@ -39,6 +39,7 @@ export default {
       tempPoints:[],
       strokes: [],
       frameN: 0,
+      totFrames: 0,
       pntDn: false,
       canDraw: false
     }
@@ -89,6 +90,10 @@ export default {
       this.frameN = _frameN;
       this.clear(0);
       this.clear(1);
+
+      if((this.totFrames <= _frameN) && this.canDraw){
+        this.totFrames = _frameN;
+      }
 
       if(this.points[this.frameN]){
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
