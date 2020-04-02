@@ -4,10 +4,11 @@
     <span id="recBtn" v-if="!playing" :class="{recording: rec}" @click="toggleRec">Rec</span>
     <span style="display: inline-block; margin-right: 10px;">Max:</span>
     <input type="number" style="width: 30px; margin-right: 10px;" min="0" v-model="frameMax" />
+    <span id="loopBtn" v-if="rec" :class="{on: looping}" @click="looping = !looping">L</span>
     <span style="display: inline-block; margin-right: 10px;">frame: {{frameNum}}</span>
     <input style="width: 40px;" type="range" v-model="frameNum" :max="frameMax">
     <span style="display: inline-block; margin:0px 10px;">speed: {{speed / 1000}}s</span>
-    <input style="width: 40px;" type="range" v-model="speed" max="1000" min="10" step="10">
+    <input style="width: 40px;" type="range" v-model="speed" max="300" min="10" step="10">
   </div>
 </template>
 <script>
@@ -28,6 +29,7 @@ export default {
       frameNum: 0,
       frameMax: 3,
       rec: false,
+      looping: false,
       playing: false
     }
   },
@@ -50,11 +52,18 @@ export default {
       if(this.frameNum < this.frameMax){
         this.frameNum++;
       }else{
-        if(this.rec){
+        if(this.rec && !this.looping){
           this.frameMax++;
         }else{
           this.frameNum = 0;
         }
+      }
+    },
+    remFrame(){
+      if(this.frameNum >= 0){
+        this.frameNum--;
+      }else{
+        this.frameNum = this.frameMax;
       }
     },
     tick(){
@@ -85,8 +94,16 @@ export default {
   },
   mounted(){
     document.addEventListener('keydown', (e)=>{
-      if(e.which == 32){
-        this.togglePlay();
+      switch(e.which){
+        case 90:
+          this.remFrame();
+          break;
+        case 88:
+          this.addFrame();
+          break;
+        case 32:
+          this.togglePlay();
+          break;
       }
     });
 
@@ -132,5 +149,16 @@ export default {
   #playBtn:hover{
     background-color: #000;
     color: #FFF;
+    }
+#loopBtn{
+  display: inline-block;
+  border: 2px solid;
+  margin-right: 10px;
+  padding: 5px;
+  cursor: pointer;
   }
+  .on, #loopBtn:hover{
+    background-color: #000;
+    color: #FFF;
+    }
 </style>

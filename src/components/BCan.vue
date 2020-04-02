@@ -1,5 +1,5 @@
 <template>
-  <div style="position: relative; height: 420px; width: 420px;">
+  <div style="position: absolute; height: 420px; width: 420px;">
     <canvas
       v-for="(can, idx) in 2"
       :key="idx"
@@ -14,6 +14,10 @@ import EventBus from '../Eventbus';
 export default {
   name: 'BCan',
   props: {
+    current: {
+      type: Boolean,
+      default: false
+    },
     curPos: {
       type: Object,
       default: function(){
@@ -32,16 +36,26 @@ export default {
   data: function(){
     return{
       points: [],
+      tempPoints:[],
       strokes: [],
-      frameN: 0
+      frameN: 0,
+      pntDn: false,
+      canDraw: false
     }
   },
   watch:{
+    current:{
+      immediate: true,
+      handler(v){
+        this.canDraw = v;
+      }
+    },
     curPos(pnt){
       this.clear(1);
-      if(pnt){
+      if(pnt && this.canDraw){
         const last = this.points[this.frameN - 1];
         let lastEl;
+        this.tempPoints.push(pnt);
 
         if(last){
           lastEl = last[last.length-1];
@@ -59,8 +73,11 @@ export default {
           }
         }
 
+        this.pntDn = true;
+
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
       }else{
+        this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
         this.points = [];
         this.drawStrokes();
@@ -75,7 +92,16 @@ export default {
 
       if(this.points[this.frameN]){
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
+      }else{
+        if(this.pntDn){
+          // this.points[this.frameN] = [...this.points];
+          // console.log(this.strokes);
+          // this.strokes.push({points: this.points[this.frameN], col: this.color, lCol: this.lineColor});
+
+          // this.draw(1, this.points, this.color, this.lineColor);
+        }
       }
+
       this.drawStrokes();
     },
     clearAll(){
@@ -119,10 +145,10 @@ export default {
 
       if(col){
         ctx.fillStyle = '#' + col;
-        ctx.fill();
         if(!lCol){
           ctx.closePath();
         }
+        ctx.fill();
       }
 
       if(lCol){

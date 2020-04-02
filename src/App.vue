@@ -16,7 +16,7 @@
 
         <div id="menu">
           <a href="#" @click="save">Save</a>
-          <a href="#" @click="$refs.paintCan.clearAll()">Clear</a>
+          <a href="#" @click="$refs.paintCan[curCan-1].clearAll()">Clear</a>
           <a href="#" @click="timelineShow = !timelineShow">Timeline</a>
           <!-- <a href="#" @click="camera">Camera</a> -->
           <input type="file" ref="file" @change="load" style="display:none" />
@@ -24,9 +24,17 @@
           <BTimeline :curPos="curPos" ref="timeline" v-show="timelineShow" />
         </div>
 
+
         <div id="canvasContainer" ref="canContainer">
+
+          <div style="position: absolute; left: -180px; top: 140px;width: 800px; height: 100px;">
+            <div style="left: 30px;" v-if="curCan > 1" class="canBtn" @click="setCan(-1)">&lt;</div>
+            <div style="right: 30px;" class="canBtn" @click="setCan(1)">&gt;</div>
+          </div>
+
           <img style="position: absolute; z-index: 9995;" src="./assets/canvas.png" />
-          <BCan ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
+          {{canNum}}
+          <BCan class="bCanvases"  v-for="(c, i) in canNum" :current="i == curCan-1" :style="{right: -1 * ((i+1) * 420)+'px'}" :key="i" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
         </div>
         <div id="pallet" >
           <div @click="toggleColor" style="z-index: 9998; position: absolute; top: -5px; left: -100px;">
@@ -82,6 +90,8 @@ export default {
   },
   data: function(){
     return{
+      curCan: 1,
+      canNum: 1,
       coloring: false,
       color: new Color('000000'),
       lineColor: null,
@@ -126,6 +136,16 @@ export default {
     }
   },
   methods:{
+    setCan(num){
+      const offset = (num  * 420);
+      console.log(offset);
+      gsap.to('.bCanvases', {right: "+=" + offset})
+      if((num + this.curCan) > this.canNum){
+        this.canNum++;
+      }
+      console.log(this.canNum);
+      this.curCan += num;
+    },
     changeColor(val){
       if(this.selected == 'bg'){
         if(this.color){
@@ -178,7 +198,7 @@ export default {
       });
 
       const tLine = this.$refs.timeline;
-      const canRef = this.$refs.paintCan;
+      const canRef = this.$refs.paintCan[this.curCan-1];
       const renderCan = this.$refs.render;
       const canLyr = canRef.$refs.can[0];
       let img;
@@ -252,7 +272,7 @@ export default {
       };
 
       this.$refs.canContainer.style.marginTop = (window.innerHeight/2) - 250  + "px";
-      paintPos = this.$refs.paintCan.$el.getBoundingClientRect()
+      paintPos = this.$refs.paintCan[this.curCan-1].$el.getBoundingClientRect()
     });
 
     this.$refs.pallet.addEventListener('pointerdown', (e) => {
@@ -498,5 +518,19 @@ html, body{
         }
         #lineTip .disabled{
           opacity: 0 !important;
+        }
+        .canBtn{
+          top: 14px;
+          font-size: 4em;
+          position: absolute;
+          padding: 10px;
+          z-index: 9998;
+          }
+        .canBtn :hover{
+          background-color:#000;
+          color:#FFF;
+        }
+        .bCanvases{
+          position: absolute;
         }
 </style>
