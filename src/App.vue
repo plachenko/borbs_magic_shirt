@@ -170,12 +170,7 @@ export default {
         if(this.color){
           this.color.mix(val);
         }else{
-<<<<<<< HEAD
-          console.log(val);
-          this.color = val;
-=======
           this.color = new Color(val.hex);
->>>>>>> dev
         }
       } else if(this.selected == 'line'){
         if(this.lineColor){

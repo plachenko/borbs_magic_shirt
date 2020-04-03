@@ -8,11 +8,7 @@
     <span style="display: inline-block; margin-right: 10px;">frame: {{frameNum}}</span>
     <input style="width: 40px;" type="range" v-model="frameNum" :max="frameMax">
     <span style="display: inline-block; margin:0px 10px;">speed: {{speed / 1000}}s</span>
-<<<<<<< HEAD
     <input style="width: 40px;" type="range" v-model="speed" max="300" min="10" step="10">
-=======
-    <input style="width: 40px;" type="range" v-model="speed" max="100" min="10" step="10">
->>>>>>> dev
   </div>
 </template>
 <script>
