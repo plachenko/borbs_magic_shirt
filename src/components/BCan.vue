@@ -157,7 +157,7 @@ export default {
       if(lCol){
         ctx.lineWidth =  3;
         ctx.strokeStyle = '#' + lCol;
-        ctx.stroke();
+        ctx.stroke(path.shift());
       }
       /*
       path.forEach((point, i) => {
