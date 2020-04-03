@@ -34,7 +34,7 @@
           </div>
 
           <img style="position: absolute; z-index: 9995;" src="./assets/canvas.png" />
-          <BCan class="bCanvases" v-for="(c, i) in canNum" :current="i == curCan-1" :key="i" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
+          <BCan :frameMax="fMax" class="bCanvases" v-for="(c, i) in canNum" :current="i == curCan-1" :key="i" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
         </div>
         <div id="pallet" >
           <div @click="toggleColor" style="z-index: 9998; position: absolute; top: -5px; left: -100px;">
@@ -101,6 +101,7 @@ export default {
       timelineShow: true,
       palletShow: false,
       refOpen: false,
+      fMax: 3,
       curPos: null,
       md: false,
       tipImg: null,
@@ -169,14 +170,18 @@ export default {
         if(this.color){
           this.color.mix(val);
         }else{
+<<<<<<< HEAD
           console.log(val);
           this.color = val;
+=======
+          this.color = new Color(val.hex);
+>>>>>>> dev
         }
       } else if(this.selected == 'line'){
         if(this.lineColor){
           this.lineColor.mix(val);
         }else{
-          this.lineColor = val;
+          this.lineColor = new Color(val.hex);
         }
       }
     },
@@ -282,6 +287,7 @@ export default {
   mounted(){
     let paintPos, palletPos;
     this.$nextTick(() => {
+      this.fMax = this.$refs.timeline.frameMax;
       this.tipImg = document.getElementById('tip');
       this.tipImg.onload = () => {
         this.tipChange();
