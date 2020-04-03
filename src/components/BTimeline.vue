@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <span id="stopBtn" v-if="!rec" :class="{stopping: stop}" @click="toggleStop">S</span>
     <span id="playBtn" v-if="!rec" @click="togglePlay">{{playing ? 'stop' : 'play'}}</span>
     <span id="recBtn" v-if="!playing" :class="{recording: rec}" @click="toggleRec">Rec</span>
     <span style="display: inline-block; margin-right: 10px;">Max:</span>
@@ -7,6 +8,8 @@
     <span id="loopBtn" v-if="rec" :class="{on: looping}" @click="looping = !looping">L</span>
     <span style="display: inline-block; margin-right: 10px;">frame: {{frameNum}}</span>
     <input style="width: 40px;" type="range" v-model="frameNum" :max="frameMax">
+    <span id="prevBtn" v-if="!rec" @click="remFrame">p</span>
+    <span id="nextBtn" v-if="!rec" @click="addFrame">n</span>
     <span style="display: inline-block; margin:0px 10px;">speed: {{speed / 1000}}s</span>
     <input style="width: 40px;" type="range" v-model="speed" max="300" min="10" step="10">
   </div>
@@ -25,6 +28,7 @@ export default {
   },
   data: function(){
     return{
+      stop: false,
       speed: 40,
       frameNum: 0,
       frameMax: 3,
@@ -51,6 +55,10 @@ export default {
     }
   },
   methods:{
+    toggleStop(){
+      this.stop = !this.stop;
+      EventBus.$emit('frameStop', this.stop);
+    },
     addFrame(){
       if(this.frameNum < this.frameMax){
         this.frameNum++;
@@ -58,12 +66,14 @@ export default {
         if(this.rec && !this.looping){
           this.frameMax++;
         }else{
-          this.frameNum = 0;
+          if(!this.stop){
+            this.frameNum = 0;
+          }
         }
       }
     },
     remFrame(){
-      if(this.frameNum >= 0){
+      if(this.frameNum > 0){
         this.frameNum--;
       }else{
         this.frameNum = this.frameMax;
@@ -85,6 +95,10 @@ export default {
         this.rec = false;
       }else{
         this.playing = !this.playing;
+      }
+
+      if(this.stop){
+        this.frameNum = 0;
       }
 
       if(this.playing){
@@ -127,6 +141,10 @@ export default {
   padding: 10px;
   background-color:#FFF;
 }
+.stopping{
+  color:#FFF;
+  background-color:#000;
+}
 .recording{
   color:#FFF;
   background-color:#F00;
@@ -142,6 +160,39 @@ export default {
     background-color: #F00;
     color: #FFF;
   }
+#stopBtn{
+  display: inline-block;
+  border: 2px solid;
+  margin-right: 10px;
+  padding: 5px;
+  cursor: pointer;
+  }
+  #stopBtn:hover{
+    background-color: #000;
+    color: #FFF;
+    }
+#nextBtn{
+  display: inline-block;
+  border: 2px solid;
+  margin-right: 10px;
+  padding: 5px;
+  cursor: pointer;
+  }
+  #nextBtn:hover{
+    background-color: #000;
+    color: #FFF;
+    }
+#prevBtn{
+  display: inline-block;
+  border: 2px solid;
+  margin-right: 10px;
+  padding: 5px;
+  cursor: pointer;
+  }
+  #prevBtn:hover{
+    background-color: #000;
+    color: #FFF;
+    }
 #playBtn{
   display: inline-block;
   border: 2px solid;

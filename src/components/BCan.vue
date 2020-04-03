@@ -16,7 +16,7 @@ export default {
   props: {
     frameMax:{
       type: Number,
-      default: 0
+      default: 3
     },
     current: {
       type: Boolean,
@@ -86,7 +86,7 @@ export default {
             this.points[this.frameN].unshift(lastEl);
           }
         }
-
+To
         this.pntDn = true;
 
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
@@ -129,6 +129,17 @@ export default {
     clear(idx){
       const can = this.$refs.can[idx];
       can.getContext('2d').clearRect(0, 0, can.width, can.height)
+    },
+    copyToAll(){
+      for(let i = 0; i <= this.frameMax; i++){
+        this.strokes.forEach((stroke)=>{
+          if(stroke.points[i-1]){
+            stroke.points[i] = stroke.points[i-1];
+            // this.draw(0, stroke.points[i], stroke.col, stroke.lCol);
+          }
+        });
+
+      }
     },
     copyToNext(){
       this.strokes.forEach((stroke)=>{

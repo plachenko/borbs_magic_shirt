@@ -18,6 +18,7 @@
           <a href="#" @click="save">Save</a>
           <a href="#" @click="$refs.paintCan[curCan-1].clearAll()">Clear</a>
           <a href="#" @click="$refs.paintCan[curCan-1].copyToNext()">Copy</a>
+          <a href="#" @click="$refs.paintCan[curCan-1].copyToAll()">CopyAll</a>
           <a href="#" @click="timelineShow = !timelineShow">Timeline</a>
           <!-- <a href="#" @click="camera">Camera</a> -->
           <input type="file" ref="file" @change="load" style="display:none" />
@@ -34,7 +35,7 @@
           </div>
 
           <img style="position: absolute; z-index: 9995;" src="./assets/canvas.png" />
-          <BCan :frameMax="fMax" class="bCanvases" v-for="(c, i) in canNum" :current="i == curCan-1" :key="i" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
+          <BCan class="bCanvases" v-for="(c, i) in canNum" :frameMax="maxFrameArr[i]"  :current="i == curCan-1" :key="i" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
         </div>
         <div id="pallet" >
           <div @click="toggleColor" style="z-index: 9998; position: absolute; top: -5px; left: -100px;">
@@ -91,6 +92,7 @@ export default {
   },
   data: function(){
     return{
+      maxStopArr: [],
       maxFrameArr: [],
       curCan: 1,
       canNum: 1,
@@ -139,6 +141,9 @@ export default {
     }
   },
   methods:{
+    frameStopChange(v){
+      this.maxStopArr[this.curCan-1] = v;
+    },
     frameMaxChange(v){
       this.maxFrameArr[this.curCan-1] = parseInt(v);
     },
@@ -154,9 +159,11 @@ export default {
         }else{
           gsap.to(e.$el, .4, {autoAlpha: 1});
         }
+        const maxStop = this.maxStopArr[this.curCan-1] ? true : false ;
         const maxFrame = this.maxFrameArr[this.curCan-1] >= 0 ? this.maxFrameArr[this.curCan-1] : -1 ;
         gsap.to(e.$el, {right: "+=" + num*420, onComplete: () => {
           this.$refs.timeline.frameNum = 0;
+          this.$refs.timeline.stop = maxStop;
           if(this.maxFrameArr[this.curCan-1] >= 0){
             this.$refs.timeline.frameMax = this.maxFrameArr[this.curCan-1];
           }else{
@@ -293,6 +300,7 @@ export default {
     });
 
     EventBus.$on('frameMax', this.frameMaxChange);
+    EventBus.$on('frameStop', this.frameStopChange);
 
     this.$refs.pallet.addEventListener('pointerdown', (e) => {
       this.$refs.brush.style.bottom = 40 + 'px';
@@ -435,7 +443,7 @@ html, body{
     }
     #middle{
       position: relative;
-      width: 500px;
+      width: 590px;
       height: 100%;
       display: flex;
       flex-flow: column;
