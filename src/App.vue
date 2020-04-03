@@ -17,7 +17,7 @@
         <div id="menu">
           <a href="#" @click="save">Save</a>
           <a href="#" @click="$refs.paintCan.clearAll()">Clear</a>
-          <a href="#" @click="$refs.paintCan.copyToNext()">Copy</a>
+          <!-- <a href="#" @click="$refs.paintCan.copyToNext()">Copy</a> -->
           <a href="#" @click="timelineShow = !timelineShow">Timeline</a>
           <!-- <a href="#" @click="camera">Camera</a> -->
           <input type="file" ref="file" @change="load" style="display:none" />
@@ -133,13 +133,13 @@ export default {
         if(this.color){
           this.color.mix(val);
         }else{
-          this.color = val;
+          this.color = new Color(val.hex);
         }
       } else if(this.selected == 'line'){
         if(this.lineColor){
           this.lineColor.mix(val);
         }else{
-          this.lineColor = val;
+          this.lineColor = new Color(val.hex);
         }
       }
     },
