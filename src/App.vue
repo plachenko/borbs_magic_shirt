@@ -247,7 +247,6 @@ export default {
     let paintPos, palletPos;
     this.$nextTick(() => {
       this.fMax = this.$refs.timeline.frameMax;
-      console.log(this.fMax);
       this.tipImg = document.getElementById('tip');
       this.tipImg.onload = () => {
         this.tipChange();
