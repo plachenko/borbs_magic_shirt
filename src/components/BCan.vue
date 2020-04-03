@@ -14,6 +14,10 @@ import EventBus from '../Eventbus';
 export default {
   name: 'BCan',
   props: {
+    frameMax:{
+      type: Number,
+      default: 0
+    },
     curPos: {
       type: Object,
       default: function(){
@@ -40,11 +44,20 @@ export default {
     curPos(pnt){
       this.clear(1);
       if(pnt){
+        if(!this.points[this.frameN]){
+          this.points[this.frameN] = [pnt];
+        }
+
+        this.points[this.frameN].push(pnt);
+        this.draw(1, this.points[this.frameN], this.color, this.lineColor);
+        /*
         const last = this.points[this.frameN - 1];
         let lastEl;
 
         if(last){
           lastEl = last[last.length-1];
+        }else if(this.points[this.frameMax]){
+          lastEl = this.points[this.frameMax][this.points.length-1];
         }
 
         if(this.points[this.frameN]){
@@ -60,6 +73,7 @@ export default {
         }
 
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
+        */
       }else{
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
         this.points = [];
@@ -111,9 +125,8 @@ export default {
     draw(idx, path, col, lCol){
       const ctx = this.$refs.can[idx].getContext('2d');
       if(idx == 1){
-        this.clear(1);
+        // this.clear(1);
       }
-
 
       ctx.beginPath();
       ctx.moveTo(path[0].x, path[0].y);
@@ -138,6 +151,11 @@ export default {
         ctx.strokeStyle = '#' + lCol;
         ctx.stroke();
       }
+      /*
+      path.forEach((point, i) => {
+        ctx.fillRect(point.x, point.y, 10, 10);
+      });
+      */
     }
   },
   mounted(){

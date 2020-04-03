@@ -27,7 +27,7 @@
 
         <div id="canvasContainer" ref="canContainer">
           <img style="position: absolute; z-index: 9995;" src="./assets/canvas.png" />
-          <BCan ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
+          <BCan :frameMax="fMax" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
         </div>
         <div id="pallet" >
           <div @click="toggleColor" style="z-index: 9998; position: absolute; top: -5px; left: -100px;">
@@ -88,9 +88,10 @@ export default {
       color: new Color('000000'),
       lineColor: null,
       selected: 'bg',
-      timelineShow: false,
+      timelineShow: true,
       palletShow: false,
       refOpen: false,
+      fMax: 3,
       curPos: null,
       md: false,
       tipImg: null,
@@ -245,6 +246,8 @@ export default {
   mounted(){
     let paintPos, palletPos;
     this.$nextTick(() => {
+      this.fMax = this.$refs.timeline.frameMax;
+      console.log(this.fMax);
       this.tipImg = document.getElementById('tip');
       this.tipImg.onload = () => {
         this.tipChange();
