@@ -116,6 +116,14 @@ export default {
       const can = this.$refs.can[idx];
       can.getContext('2d').clearRect(0, 0, can.width, can.height)
     },
+    copyToNext(){
+      this.strokes.forEach((stroke)=>{
+        if(stroke.points[this.frameN-1]){
+          stroke.points[this.frameN] = stroke.points[this.frameN-1];
+          this.draw(0, stroke.points[this.frameN], stroke.col, stroke.lCol);
+        }
+      });
+    },
     drawStrokes(){
       const underCan = this.$refs.can[0].getContext('2d');
       underCan.fillStyle = "#FFF";

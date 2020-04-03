@@ -17,6 +17,7 @@
         <div id="menu">
           <a href="#" @click="save">Save</a>
           <a href="#" @click="$refs.paintCan[curCan-1].clearAll()">Clear</a>
+          <a href="#" @click="$refs.paintCan[curCan-1].copyToNext()">Copy</a>
           <a href="#" @click="timelineShow = !timelineShow">Timeline</a>
           <!-- <a href="#" @click="camera">Camera</a> -->
           <input type="file" ref="file" @change="load" style="display:none" />
