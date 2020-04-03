@@ -168,6 +168,7 @@ export default {
         if(this.color){
           this.color.mix(val);
         }else{
+          console.log(val);
           this.color = val;
         }
       } else if(this.selected == 'line'){

@@ -14,8 +14,7 @@ export default class Color{
   }
 
   public mix(color: Color){
-    /*
-    const mixAmt = 5;
+    const mixAmt = 3;
     const rdiff = Math.floor((color.red - this.red) / mixAmt);
     const bdiff = Math.floor((color.blue - this.blue) / mixAmt);
     const gdiff = Math.floor((color.green - this.green) / mixAmt);
@@ -28,10 +27,6 @@ export default class Color{
 
     if(this.green >= 0 && this.green <= 255)
       this.green += gdiff;
-    */
-   this.red = color.red;
-   this.blue = color.blue;
-   this.green = color.green;
   }
 
   public hexToRgb(_hex: string){

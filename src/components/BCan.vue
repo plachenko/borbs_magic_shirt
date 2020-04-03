@@ -89,7 +89,7 @@ export default {
     frameChange(_frameN){
       this.frameN = _frameN;
       this.clear(0);
-      this.clear(1);
+      // this.clear(1);
 
       if(this.points[this.frameN]){
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
