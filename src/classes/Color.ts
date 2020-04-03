@@ -15,9 +15,9 @@ export default class Color{
 
   public mix(color: Color){
     const mixAmt = 3;
-    const rdiff = Math.round((color.red - this.red) / mixAmt);
-    const bdiff = Math.round((color.blue - this.blue) / mixAmt);
-    const gdiff = Math.round((color.green - this.green) / mixAmt);
+    const rdiff = Math.floor((color.red - this.red) / mixAmt);
+    const bdiff = Math.floor((color.blue - this.blue) / mixAmt);
+    const gdiff = Math.floor((color.green - this.green) / mixAmt);
 
     if(this.red >= 0 && this.red <= 255)
       this.red += rdiff;
