@@ -71,12 +71,8 @@ import Color from './classes/Color';
 
 // eslint-disable-next-line
 import GIF from './assets/js/gif.js';
-<<<<<<< Updated upstream
-import WorkerGIF from 'raw-loader!./assets/js/gif.worker.js';
-=======
 import * as WorkerGIF from '!!raw-loader!./assets/js/gif.worker';
 import EventBus from './Eventbus';
->>>>>>> Stashed changes
 
 export default {
   name: 'App',
