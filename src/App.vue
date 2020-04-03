@@ -16,6 +16,7 @@
 
         <div id="menu">
           <a href="#" @click="save">Save</a>
+          <a href="#" @click="$refs.paintCan.zoom()">Zoom</a>
           <a href="#" @click="$refs.paintCan.clearAll()">Clear</a>
           <!-- <a href="#" @click="$refs.paintCan.copyToNext()">Copy</a> -->
           <a href="#" @click="timelineShow = !timelineShow">Timeline</a>

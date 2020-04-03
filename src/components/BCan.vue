@@ -36,6 +36,7 @@ export default {
   data: function(){
     return{
       fpnt: null,
+      zoomed: false,
       points: [],
       strokes: [],
       frameN: 0
@@ -90,6 +91,27 @@ export default {
     }
   },
   methods:{
+    zoom(){
+      let zoom;
+      if(this.zoomed){
+        this.zoomed = false;
+        zoom = .5;
+      }else{
+        this.zoomed = true;
+        zoom = 2;
+      }
+      this.strokes.forEach((stroke)=>{
+        for(let f = 0; f <= this.frameMax; f++){
+          if(stroke.points[f]){
+            stroke.points[f].forEach((pnt) => {
+              pnt.x = pnt.x *zoom;
+              pnt.y = pnt.y *zoom;
+            });
+          }
+        }
+      })
+      this.drawStrokes();
+    },
     frameChange(_frameN){
       this.frameN = _frameN;
       this.clear(0);
