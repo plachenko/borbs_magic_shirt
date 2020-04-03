@@ -35,6 +35,7 @@ export default {
   },
   data: function(){
     return{
+      fpnt: null,
       points: [],
       strokes: [],
       frameN: 0
@@ -44,8 +45,13 @@ export default {
     curPos(pnt){
       this.clear(1);
       if(pnt){
+        if(!this.pntDn){
+          this.fpnt = Object.assign({}, pnt);
+          this.pntDn = true;
+        }
+
         if(!this.points[this.frameN]){
-          this.points[this.frameN] = [pnt];
+          this.points[this.frameN] = [this.fpnt, pnt];
         }
 
         this.points[this.frameN].push(pnt);
@@ -75,8 +81,10 @@ export default {
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
         */
       }else{
+        this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
         this.points = [];
+        this.fpnt = null;
         this.drawStrokes();
       }
     }
