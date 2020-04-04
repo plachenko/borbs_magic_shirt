@@ -14,6 +14,10 @@ import EventBus from '../Eventbus';
 export default {
   name: 'BCan',
   props: {
+    zoom:{
+      type: Boolean,
+      default: false
+    },
     frameMax:{
       type: Number,
       default: 0
@@ -45,7 +49,7 @@ export default {
   watch:{
     curPos(pnt){
       this.clear(1);
-      if(pnt){
+      if(pnt && !this.zoom){
         if(!this.pntDn){
           this.fpnt = Object.assign({}, pnt);
           this.pntDn = true;
@@ -88,10 +92,13 @@ export default {
         this.fpnt = null;
         this.drawStrokes();
       }
+      if(this.zoom){
+        console.log(pnt)
+      }
     }
   },
   methods:{
-    zoom(){
+    zoomChange(){
       let zoom;
       if(this.zoomed){
         this.zoomed = false;
@@ -179,7 +186,7 @@ export default {
       if(lCol){
         ctx.lineWidth =  3;
         ctx.strokeStyle = '#' + lCol;
-        ctx.stroke(path.shift());
+        ctx.stroke();
       }
       /*
       path.forEach((point, i) => {

@@ -3,9 +3,10 @@
 
     <div ref="cap" id="cap" />
     <div ref="brush" id="brush">
-      <canvas :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9994;"/>
-      <canvas id="lineTip" :style="{opacity: !lineColor ? 0 : 1}" width="26" height="19" ref="linetip" style="left: -2px; position: absolute; z-index:9993;"/>
-      <img :class="{disabled: !color}" ref="tipBG" style="left: 0px; position: absolute;z-index: 9993;" src="./assets/tip.png" id="tip" />
+      <canvas v-if="!zoom" :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9994;"/>
+      <canvas v-if="!zoom" id="lineTip" :style="{opacity: !lineColor ? 0 : 1}" width="26" height="19" ref="linetip" style="left: -2px; position: absolute; z-index:9993;"/>
+      <img v-if="zoom" :class="{disabled: !color}" style="left: -10px; top: -20px; position: absolute; z-index: 83;" src="./assets/magnifying.png" id="tip" />
+      <img v-else :class="{disabled: !color}" ref="tipBG" style="left: 0px; position: absolute;z-index: 9993;" src="./assets/tip.png" id="tip" />
       <img src="./assets/brush.png" style="left: 20px; position: absolute;" />
       <div id="sleeve" />
     </div>
@@ -16,7 +17,7 @@
 
         <div id="menu">
           <a href="#" @click="save">Save</a>
-          <a href="#" @click="$refs.paintCan.zoom()">Zoom</a>
+          <a href="#" :class="{zoom: zoom}" @click="toggleZoom">Zoom</a>
           <a href="#" @click="$refs.paintCan.clearAll()">Clear</a>
           <!-- <a href="#" @click="$refs.paintCan.copyToNext()">Copy</a> -->
           <a href="#" @click="timelineShow = !timelineShow">Timeline</a>
@@ -28,7 +29,7 @@
 
         <div id="canvasContainer" ref="canContainer">
           <img style="position: absolute; z-index: 9995;" src="./assets/canvas.png" />
-          <BCan :frameMax="fMax" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
+          <BCan :zoom="zoom" :frameMax="fMax" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
         </div>
         <div id="pallet" >
           <div @click="toggleColor" style="z-index: 9998; position: absolute; top: -5px; left: -100px;">
@@ -47,7 +48,7 @@
             </div>
           </div>
 
-          <div ref="pallet" style="display: flex; width: 100%; position: absolute; height: 100%;">
+          <div v-if="!zoom" ref="pallet" style="display: flex; width: 100%; position: absolute; height: 100%;">
             <div
               class="palletCol"
               v-for="(col, idx) in colors"
@@ -85,6 +86,7 @@ export default {
   },
   data: function(){
     return{
+      zoom: false,
       coloring: false,
       color: new Color('000000'),
       lineColor: null,
@@ -130,6 +132,9 @@ export default {
     }
   },
   methods:{
+    toggleZoom(){
+      this.zoom = !this.zoom;
+    },
     changeColor(val){
       if(this.selected == 'bg'){
         if(this.color){
@@ -250,7 +255,9 @@ export default {
       this.fMax = this.$refs.timeline.frameMax;
       this.tipImg = document.getElementById('tip');
       this.tipImg.onload = () => {
-        this.tipChange();
+        if(!this.zoom){
+          this.tipChange();
+        }
       };
 
       this.$refs.canContainer.style.marginTop = (window.innerHeight/2) - 250  + "px";
@@ -291,31 +298,35 @@ export default {
           this.curPos = {x: x, y: y};
 
           // HACK!
-          this.$refs.tipBG.style.top = "-4px";
-          this.$refs.tipBG.style.left = "6px";
-          this.$refs.tipBG.style.transform = "scaleX(-1) rotate(90deg)";
+          if(!this.zoom){
+            this.$refs.tipBG.style.top = "-4px";
+            this.$refs.tipBG.style.left = "6px";
+            this.$refs.tipBG.style.transform = "scaleX(-1) rotate(90deg)";
 
-          this.$refs.linetip.style.top = "-7px";
-          this.$refs.linetip.style.left = "5px";
-          this.$refs.linetip.style.transform = "scaleX(-1) rotate(90deg)";
+            this.$refs.linetip.style.top = "-7px";
+            this.$refs.linetip.style.left = "5px";
+            this.$refs.linetip.style.transform = "scaleX(-1) rotate(90deg)";
 
-          this.$refs.tip.style.top = "-4px";
-          this.$refs.tip.style.left = "6px";
-          this.$refs.tip.style.transform = "scaleX(-1) rotate(90deg)";
+            this.$refs.tip.style.top = "-4px";
+            this.$refs.tip.style.left = "6px";
+            this.$refs.tip.style.transform = "scaleX(-1) rotate(90deg)";
+          }
         }else{
           // HACK!
-          this.$refs.tipBG.style.top = "0px";
-          this.$refs.tipBG.style.left = "0px";
-          this.$refs.tipBG.style.transform = "rotate(0deg)";
+          if(!this.zoom){
+            this.$refs.tipBG.style.top = "0px";
+            this.$refs.tipBG.style.left = "0px";
+            this.$refs.tipBG.style.transform = "rotate(0deg)";
 
-          this.$refs.linetip.style.top = "-1px";
-          this.$refs.linetip.style.left = "-4px";
-          this.$refs.linetip.style.transform = "rotate(0deg)";
+            this.$refs.linetip.style.top = "-1px";
+            this.$refs.linetip.style.left = "-4px";
+            this.$refs.linetip.style.transform = "rotate(0deg)";
 
-          this.$refs.tip.style.top = "0px";
-          this.$refs.tip.style.left = "0px";
-          this.$refs.tip.style.transform = "rotate(0deg)";
-          this.curPos = null;
+            this.$refs.tip.style.top = "0px";
+            this.$refs.tip.style.left = "0px";
+            this.$refs.tip.style.transform = "rotate(0deg)";
+            this.curPos = null;
+          }
         }
       } else {
         this.md = false;
@@ -500,5 +511,8 @@ html, body{
         }
         #lineTip .disabled{
           opacity: 0 !important;
+        }
+        .zoom{
+          background-color:#444;
         }
 </style>
