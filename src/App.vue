@@ -1,34 +1,42 @@
 <template>
   <div id="app">
+    <!--
+      =Borb's Magic Shirt=
+      An HTML Canvas applcation that uses context2D to paint in time.
 
-    <div ref="cap" id="cap" />
-    <div ref="brush" id="brush">
-      <canvas :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9994;"/>
-      <canvas id="lineTip" :style="{opacity: !lineColor ? 0 : 1}" width="26" height="19" ref="linetip" style="left: -2px; position: absolute; z-index:9993;"/>
-      <img :class="{disabled: !color}" ref="tipBG" style="left: 0px; position: absolute;z-index: 9993;" src="./assets/tip.png" id="tip" />
-      <img src="./assets/brush.png" style="left: 20px; position: absolute;" />
-      <div id="sleeve" />
-    </div>
+      Check out TomThinks on twitch to catch a borb painting stream!
+      https://www.twitch.tv/tomthinks
+    -->
 
+    <!-- The Event Capture -->
+    <!-- <BEvent /> -->
+
+    <!-- Borb's shirt sleeve. -->
+    <!-- <BSleeve :curPos="curPos" /> -->
+
+    <!-- Middle Container -->
     <div id="container">
       <div id="middle">
-        <div id="refImg" ref="refImg"></div>
 
-        <div id="menu">
-          <a href="#" @click="save">Save</a>
-          <a href="#" @click="$refs.paintCan.clearAll()">Clear</a>
-          <!-- <a href="#" @click="$refs.paintCan.copyToNext()">Copy</a> -->
-          <a href="#" @click="timelineShow = !timelineShow">Timeline</a>
-          <!-- <a href="#" @click="camera">Camera</a> -->
-          <input type="file" ref="file" @change="load" style="display:none" />
-          <a href="#" @click="$refs.file.click()" style="border-radius: 0px 0px 15px 0px">Load</a>
-          <BTimeline :curPos="curPos" ref="timeline" v-show="timelineShow" />
-        </div>
+        <BMenu />
 
+        <!--
         <div id="canvasContainer" ref="canContainer">
           <img style="position: absolute; z-index: 9995;" src="./assets/canvas.png" />
           <BCan :frameMax="fMax" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
         </div>
+        -->
+        <BCan />
+
+      </div>
+    </div>
+
+    <!--
+    <div id="container">
+      <div id="middle">
+        <div id="refImg" ref="refImg"></div>
+
+
         <div id="pallet" >
           <div @click="toggleColor" style="z-index: 9998; position: absolute; top: -5px; left: -100px;">
             Fill
@@ -54,18 +62,17 @@
               @click="changeColor(col)"
               />
           </div>
-          <!-- <canvas ref="palletCan" width="315" height="35" /> -->
           <img src="./assets/pallet.png" ref="palletImg">
         </div>
       </div>
     </div>
     <canvas ref="render" width="420" height="420" style="display: none;" />
-
+    -->
   </div>
 </template>
 
 <script>
-import BCan from './components/BCan';
+/*
 import BTimeline from './components/BTimeline';
 import gsap from 'gsap';
 import Color from './classes/Color';
@@ -73,15 +80,30 @@ import Color from './classes/Color';
 // eslint-disable-next-line
 import GIF from './assets/js/gif.js';
 import * as WorkerGIF from '!!raw-loader!./assets/js/gif.worker';
+*/
+
 import EventBus from './Eventbus';
+import BSleeve from './components/BSleeve';
+import BEvent from './components/BEvent';
+import BMenu from './components/BMenu';
+import BCan from './components/BCan';
 
 export default {
   name: 'App',
   components: {
     BCan,
-    BTimeline
+    BMenu
+    // BEvent
+    // BSleeve
+    // BTimeline
     // BColor
   },
+  mounted(){
+    EventBus.$on('pDn', (e)=>{
+      // console.log(e);
+    })
+  }
+  /*
   data: function(){
     return{
       coloring: false,
@@ -270,72 +292,8 @@ export default {
       }
     });
 
-
-    this.$refs.cap.addEventListener('pointerup', (e) => {
-      this.md = false;
-    });
-    this.$refs.cap.addEventListener('pointerdown', (e) => {
-      this.md = true;
-    });
-
-    this.$refs.cap.addEventListener('pointermove', (e) => {
-      this.$refs.brush.style.width = (window.innerWidth - e.offsetX) + 'px';
-      let top = e.screenY + 'px'
-
-      if((e.offsetX > paintPos.x - 50 && e.offsetX < paintPos.x + paintPos.width + 50) &&
-        (e.offsetY > paintPos.y && e.offsetY -50 < paintPos.y + paintPos.height + 20)){
-        if(this.md){
-          const x = Math.round(e.offsetX - paintPos.x);
-          const y = Math.round(e.offsetY - paintPos.y);
-          this.curPos = {x: x, y: y};
-
-          // HACK!
-          this.$refs.tipBG.style.top = "-4px";
-          this.$refs.tipBG.style.left = "6px";
-          this.$refs.tipBG.style.transform = "scaleX(-1) rotate(90deg)";
-
-          this.$refs.linetip.style.top = "-7px";
-          this.$refs.linetip.style.left = "5px";
-          this.$refs.linetip.style.transform = "scaleX(-1) rotate(90deg)";
-
-          this.$refs.tip.style.top = "-4px";
-          this.$refs.tip.style.left = "6px";
-          this.$refs.tip.style.transform = "scaleX(-1) rotate(90deg)";
-        }else{
-          // HACK!
-          this.$refs.tipBG.style.top = "0px";
-          this.$refs.tipBG.style.left = "0px";
-          this.$refs.tipBG.style.transform = "rotate(0deg)";
-
-          this.$refs.linetip.style.top = "-1px";
-          this.$refs.linetip.style.left = "-4px";
-          this.$refs.linetip.style.transform = "rotate(0deg)";
-
-          this.$refs.tip.style.top = "0px";
-          this.$refs.tip.style.left = "0px";
-          this.$refs.tip.style.transform = "rotate(0deg)";
-          this.curPos = null;
-        }
-      } else {
-        this.md = false;
-      }
-
-      if(e.offsetY > window.innerHeight - window.innerHeight/9 && !this.palletShow){
-        this.palletShow = true;
-        gsap.to('#pallet', {bottom: -5})
-        top = e.offsetY - 45;
-        this.$refs.brush.style.transform = "scaleY(-1)"
-      } else if(e.offsetY < window.innerHeight - window.innerHeight/9){
-        gsap.to('#pallet', {bottom: -65})
-        top = e.offsetY
-        this.$refs.brush.style.transform = "scaleY(1)"
-        this.palletShow = false;
-      }
-
-      this.$refs.brush.style.top = top + 'px';
-      this.$refs.brush.style.left = e.offsetX - 15 + 'px';
-    });
   }
+*/
 }
 </script>
 
@@ -361,28 +319,23 @@ html, body{
   flex-flow: column;
   justify-content: center;
   }
-  #cap{
-    position: absolute;
-    left:0px;
-    top: 0px;
-    width: 100%;
-    height: 100%;
-    z-index: 9998;
-    cursor: none;
-    }
-  #brush{
-    position: absolute;
-    z-index: 9997;
-    background-repeat: repeat-x;
-    color:#000;
-    position: absolute;
-    }
   #container{
     flex: 1;
     display: flex;
     flex-flow: column;
     align-items: center;
     }
+    #middle{
+      position: relative;
+      width: 500px;
+      height: 100%;
+      flex: 1;
+      display: flex;
+      flex-flow: column;
+      align-items: center;
+      background-color:#F00;
+      }
+/*
   #refImg{
     background-repeat: no-repeat;
     background-size: cover;
@@ -394,14 +347,6 @@ html, body{
     box-sizing: border-box;
     top: -230px;
     border: 2px solid;
-    }
-    #middle{
-      position: relative;
-      width: 500px;
-      height: 100%;
-      display: flex;
-      flex-flow: column;
-      align-items: center;
     }
   #canvasContainer{
     width: 442px;
@@ -425,53 +370,8 @@ html, body{
         flex:1;
         box-sizing: border-box;
         z-index: 9998;
-        /* visibility: hidden; */
-        /* background-color:#F00; */
-        }
-        .palletCol :hover{
-          /* background-color:#FF0; */
-          /* visibility: visible; */
         }
 
-    #menu{
-      /* width: 300px; */
-      z-index: 9998;
-      position: relative;
-      background-color:#FFF;
-      border-radius: 0px 0px 20px 20px;
-      border: 2px solid;
-      border-top: none;
-      z-index: 9999;
-      }
-      #menu a{
-        display: inline-block;
-        width: 70px;
-        text-align: center;
-        text-decoration: none;
-        font-weight: bold;
-        color:#000;
-        border-left: 2px solid;
-        padding: 10px 10px;
-        }
-        #menu a:hover{
-          background-color:#000;
-          color: #FFF;
-          }
-        #menu a:first-child{
-          border-radius: 0px 0px 0px 15px;
-          border-left: none;
-          }
-      #sleeve{
-        width: 100%;
-        box-sizing: border-box;
-        height: 40px;
-        border-top: 3px solid;
-        border-bottom: 3px solid;
-        position: absolute;
-        left: 143px;
-        top: 73px;
-        background-color:#FFF;
-      }
 
       .colPrev{
         border: 1px solid;
@@ -500,4 +400,5 @@ html, body{
         #lineTip .disabled{
           opacity: 0 !important;
         }
+        */
 </style>
