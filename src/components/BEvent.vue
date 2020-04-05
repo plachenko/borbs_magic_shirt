@@ -32,6 +32,7 @@ export default {
 
     capRef.addEventListener('pointermove', (e) => {
       EventBus.$emit('pMv', e);
+      // console.log(e);
       /*
       this.$refs.brush.style.width = (window.innerWidth - e.offsetX) + 'px';
       let top = e.screenY + 'px'
@@ -101,6 +102,6 @@ export default {
   width: 100%;
   height: 100%;
   z-index: 9998;
-  cursor: none;
+  /* cursor: none; */
   }
 </style>

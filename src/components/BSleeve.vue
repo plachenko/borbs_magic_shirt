@@ -8,23 +8,58 @@
   </div>
 </template>
 <script>
+import EventBus from '@/Eventbus';
 export default {
   name: 'BSleeve',
-  props: {
-    curPos: {
-      type: Object,
-      default: function(){
-        return null;
-      }
-    }
-  },
   data: function(){
     return{
-
+      tipImg: null
     }
   },
   methods:{
+    tipChange(){
+      const ctxt = this.$refs.linetip.getContext('2d');
+      ctxt.drawImage(this.tipImg, 0, 0);
+      ctxt.fillStyle = this.lineColor ? "#"+this.lineColor.hex : "";
 
+      ctxt.globalCompositeOperation = "source-in";
+      ctxt.fillRect(0,0,14,14);
+
+      const ctx = this.$refs.tip.getContext('2d');
+      ctx.drawImage(this.tipImg, 0, 0);
+      ctx.fillStyle = this.color ? "#"+this.color.hex : "";
+
+      ctx.globalCompositeOperation = "source-in";
+      ctx.fillRect(0,0,14,14);
+    },
+    renderPos(x, y){
+      this.$refs.brush.style.left = x + 'px';
+      this.$refs.brush.style.top = y + 'px';
+
+      this.$refs.brush.style.width = (window.innerWidth - x) + 'px';
+    }
+  },
+  mounted(){
+    this.$nextTick(() => {
+      this.tipImg = document.getElementById('tip');
+      this.tipImg.onload = () => {
+        this.tipChange();
+      };
+
+      EventBus.$on('pUp', (e)=>{
+        // this.$refs.brush.style.bottom = 40 + 'px';
+
+      });
+
+      EventBus.$on('pDn', (e)=>{
+        // this.$refs.brush.style.bottom = 40 + 'px';
+      });
+      
+      EventBus.$on('pMv', (e)=>{
+        this.renderPos(e.screenX, e.screenY - 125);
+      });
+      this.renderPos(window.innerWidth/2, window.innerHeight/2);
+    })
   }
 }
 </script>
@@ -43,6 +78,7 @@ export default {
       border-top: 3px solid;
       border-bottom: 3px solid;
       position: absolute;
+      background: #F00;
       left: 143px;
       top: 73px;
       background-color:#FFF;

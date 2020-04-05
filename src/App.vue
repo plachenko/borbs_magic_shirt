@@ -9,94 +9,51 @@
     -->
 
     <!-- The Event Capture -->
-    <!-- <BEvent /> -->
+    <BEvent />
 
     <!-- Borb's shirt sleeve. -->
-    <!-- <BSleeve :curPos="curPos" /> -->
+    <BSleeve />
 
     <!-- Middle Container -->
     <div id="container">
       <div id="middle">
+        <!-- Reference Image that loads -->
+        <!-- <div id="refImg" ref="refImg"></div> -->
 
+        <!-- Menu items. -->
         <BMenu />
 
-        <!--
-        <div id="canvasContainer" ref="canContainer">
-          <img style="position: absolute; z-index: 9995;" src="./assets/canvas.png" />
-          <BCan :frameMax="fMax" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" />
-        </div>
-        -->
+        <!-- Paint Canvas -->
         <BCan />
+        <!-- <BCan :frameMax="fMax" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" /> -->
+        
+        <!-- Paint Pallet -->
+        <!-- <BPallet /> -->
 
       </div>
     </div>
 
-    <!--
-    <div id="container">
-      <div id="middle">
-        <div id="refImg" ref="refImg"></div>
-
-
-        <div id="pallet" >
-          <div @click="toggleColor" style="z-index: 9998; position: absolute; top: -5px; left: -100px;">
-            Fill
-            <div :class="{cur: selected == 'bg'}" class="colPrev">
-              <span v-show="!color" class="X">X</span>
-              <div :style="{backgroundColor: color ? '#'+color.hex : '#FFF'}" />
-            </div>
-          </div>
-
-          <div @click="toggleLine" style="z-index: 9998; position: absolute; top: -5px; right: -100px;">
-            Stroke
-            <div :class="{cur: selected == 'line'}" class="colPrev">
-              <span v-show="!lineColor" class="X">X</span>
-              <div :style="{backgroundColor: lineColor ? '#'+lineColor.hex : '#FFF'}" />
-            </div>
-          </div>
-
-          <div ref="pallet" style="display: flex; width: 100%; position: absolute; height: 100%;">
-            <div
-              class="palletCol"
-              v-for="(col, idx) in colors"
-              :key="idx"
-              @click="changeColor(col)"
-              />
-          </div>
-          <img src="./assets/pallet.png" ref="palletImg">
-        </div>
-      </div>
-    </div>
-    <canvas ref="render" width="420" height="420" style="display: none;" />
-    -->
   </div>
 </template>
 
 <script>
-/*
-import BTimeline from './components/BTimeline';
-import gsap from 'gsap';
-import Color from './classes/Color';
-
-// eslint-disable-next-line
-import GIF from './assets/js/gif.js';
-import * as WorkerGIF from '!!raw-loader!./assets/js/gif.worker';
-*/
+// import gsap from 'gsap';
 
 import EventBus from './Eventbus';
 import BSleeve from './components/BSleeve';
 import BEvent from './components/BEvent';
 import BMenu from './components/BMenu';
 import BCan from './components/BCan';
+// import BPallet from './components/BPallet';
 
 export default {
   name: 'App',
   components: {
     BCan,
-    BMenu
-    // BEvent
-    // BSleeve
-    // BTimeline
-    // BColor
+    BMenu,
+    // BPallet
+    BEvent,
+    BSleeve
   },
   mounted(){
     EventBus.$on('pDn', (e)=>{
@@ -116,7 +73,6 @@ export default {
       fMax: 3,
       curPos: null,
       md: false,
-      tipImg: null,
       armShow: true,
       colors:[
         new Color('000000'),
@@ -269,10 +225,7 @@ export default {
     let paintPos, palletPos;
     this.$nextTick(() => {
       this.fMax = this.$refs.timeline.frameMax;
-      this.tipImg = document.getElementById('tip');
-      this.tipImg.onload = () => {
-        this.tipChange();
-      };
+      
 
       this.$refs.canContainer.style.marginTop = (window.innerHeight/2) - 250  + "px";
       paintPos = this.$refs.paintCan.$el.getBoundingClientRect()
@@ -333,7 +286,6 @@ html, body{
       display: flex;
       flex-flow: column;
       align-items: center;
-      background-color:#F00;
       }
 /*
   #refImg{
@@ -348,14 +300,7 @@ html, body{
     top: -230px;
     border: 2px solid;
     }
-  #canvasContainer{
-    width: 442px;
-    position: relative;
-    height: 100%;
-    margin-top: 60px;
-    background-image: url('./assets/canvasBot.png');
-    align-self: center;
-    }
+  
     #paintCan{
       background-color:#FFF;
       position: absolute;

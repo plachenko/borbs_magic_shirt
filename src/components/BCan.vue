@@ -1,5 +1,5 @@
 <template>
-  <div style="position: relative; height: 420px; width: 420px;">
+  <div id="canvasContainer" ref="canContainer">
     <canvas
       v-for="(can, idx) in 2"
       :key="idx"
@@ -7,6 +7,7 @@
       height="420"
       ref="can"
       />
+    <div id="canvasImg" />
   </div>
 </template>
 <script>
@@ -168,6 +169,9 @@ export default {
   },
   mounted(){
     EventBus.$on('frameChange', this.frameChange);
+    this.$nextTick(() => {
+      this.$refs.canContainer.style.marginTop = (window.innerHeight/2) - 250  + "px";
+    });
   }
 }
 </script>
@@ -177,4 +181,22 @@ canvas{
   top: 0px;
   left: 0px;
   }
+
+  #canvasContainer{
+    width: 442px;
+    position: relative;
+    height: 100%;
+    margin-top: 60px;
+    background-image: url('../assets/canvasBot.png');
+    align-self: center;
+    }
+  #canvasImg{
+    position: absolute;
+    z-index: 9995;
+    background-image: url('../assets/canvas.png');
+    background-size: cover;
+    width: 100%;
+    height: 449px;
+    background-color:#FFF;
+    }
 </style>
