@@ -13,7 +13,18 @@ export default {
   name: 'BSleeve',
   data: function(){
     return{
+      palletShow: false,
       tipImg: null
+    }
+  },
+  props: {
+    color: {
+      type: String,
+      default: "000000"
+    },
+    lineColor: {
+      type: String,
+      default: "000000"
     }
   },
   methods:{
@@ -32,33 +43,74 @@ export default {
       ctx.globalCompositeOperation = "source-in";
       ctx.fillRect(0,0,14,14);
     },
-    renderPos(x, y){
-      this.$refs.brush.style.left = x + 'px';
-      this.$refs.brush.style.top = y + 'px';
+    renderPos(_x, _y){
+      const x = Math.round(_x);
+      const y = Math.round(_y);
+
+      this.$refs.brush.style.left = (x - 15) + 'px';
+      this.$refs.brush.style.top = (y + 5) + 'px';
 
       this.$refs.brush.style.width = (window.innerWidth - x) + 'px';
     }
   },
   mounted(){
+    const w = window.innerWidth;
+    const h = window.innerHeight;
     this.$nextTick(() => {
       this.tipImg = document.getElementById('tip');
       this.tipImg.onload = () => {
         this.tipChange();
       };
 
-      EventBus.$on('pUp', (e)=>{
-        // this.$refs.brush.style.bottom = 40 + 'px';
-
-      });
-
       EventBus.$on('pDn', (e)=>{
-        // this.$refs.brush.style.bottom = 40 + 'px';
+          this.$refs.tipBG.style.top = "-4px";
+          this.$refs.tipBG.style.left = "6px";
+          this.$refs.tipBG.style.transform = "scaleX(-1) rotate(90deg)";
+
+          this.$refs.linetip.style.top = "-7px";
+          this.$refs.linetip.style.left = "5px";
+          this.$refs.linetip.style.transform = "scaleX(-1) rotate(90deg)";
+
+          this.$refs.tip.style.top = "-4px";
+          this.$refs.tip.style.left = "6px";
+          this.$refs.tip.style.transform = "scaleX(-1) rotate(90deg)";
       });
-      
+
+      EventBus.$on('pUp', (e)=>{
+          this.$refs.tipBG.style.top = "0px";
+          this.$refs.tipBG.style.left = "0px";
+          this.$refs.tipBG.style.transform = "rotate(0deg)";
+
+          this.$refs.linetip.style.top = "-1px";
+          this.$refs.linetip.style.left = "-4px";
+          this.$refs.linetip.style.transform = "rotate(0deg)";
+
+          this.$refs.tip.style.top = "0px";
+          this.$refs.tip.style.left = "0px";
+          this.$refs.tip.style.transform = "rotate(0deg)";
+      });
+
       EventBus.$on('pMv', (e)=>{
-        this.renderPos(e.screenX, e.screenY - 125);
+        let top = e.offsetY;
+
+        if(e.offsetY > window.innerHeight - window.innerHeight/9 && !this.palletShow){
+          this.palletShow = true;
+          top = e.offsetY - 45;
+          this.$refs.brush.style.transform = "scaleY(-1)"
+        } else if(e.offsetY < window.innerHeight - window.innerHeight/9){
+          top = e.offsetY
+          this.$refs.brush.style.transform = "scaleY(1)"
+          this.palletShow = false;
+        }
+
+        this.renderPos(e.offsetX, top);
       });
-      this.renderPos(window.innerWidth/2, window.innerHeight/2);
+
+      EventBus.$on('resize', () => {
+        this.renderPos(w/2, h/2);
+      });
+
+      this.renderPos(w/2, h/2);
     })
   }
 }

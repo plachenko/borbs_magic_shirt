@@ -12,6 +12,7 @@ export default {
     const capRef = this.$refs.cap;
 
     window.addEventListener('resize', (e)=>{
+      EventBus.$emit('resize', e);
       // console.log(window.innerWidth, window.innerHeight);
     });
 
@@ -102,6 +103,6 @@ export default {
   width: 100%;
   height: 100%;
   z-index: 9998;
-  /* cursor: none; */
+  cursor: none;
   }
 </style>

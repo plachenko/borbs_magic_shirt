@@ -26,9 +26,9 @@
         <!-- Paint Canvas -->
         <BCan />
         <!-- <BCan :frameMax="fMax" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" /> -->
-        
+
         <!-- Paint Pallet -->
-        <!-- <BPallet /> -->
+        <BPallet />
 
       </div>
     </div>
@@ -39,19 +39,23 @@
 <script>
 // import gsap from 'gsap';
 
+// eslint-disable-next-line
+import GIF from './assets/js/gif.js';
+import * as WorkerGIF from '!!raw-loader!./assets/js/gif.worker';
+
 import EventBus from './Eventbus';
 import BSleeve from './components/BSleeve';
 import BEvent from './components/BEvent';
 import BMenu from './components/BMenu';
 import BCan from './components/BCan';
-// import BPallet from './components/BPallet';
+import BPallet from './components/BPallet';
 
 export default {
   name: 'App',
   components: {
     BCan,
     BMenu,
-    // BPallet
+    BPallet,
     BEvent,
     BSleeve
   },
@@ -59,89 +63,8 @@ export default {
     EventBus.$on('pDn', (e)=>{
       // console.log(e);
     })
-  }
-  /*
-  data: function(){
-    return{
-      coloring: false,
-      color: new Color('000000'),
-      lineColor: null,
-      selected: 'bg',
-      timelineShow: true,
-      palletShow: false,
-      refOpen: false,
-      fMax: 3,
-      curPos: null,
-      md: false,
-      armShow: true,
-      colors:[
-        new Color('000000'),
-        new Color('FFFFFF'),
-        new Color('F2B7D6'),
-        new Color('E91D3B'),
-        new Color('FDBC24'),
-        new Color('45B5F1'),
-        new Color('A776EE'),
-        new Color('58E8A4'),
-        new Color('162770'),
-        new Color('5A2F1C'),
-        new Color('F7EB3D'),
-        new Color('C7C6C7'),
-        new Color('115011'),
-        new Color('380E74')
-      ]
-    }
-  },
-  watch:{
-    color:{
-      deep:true,
-      handler(){
-        this.tipChange();
-      }
-    },
-    lineColor:{
-      deep:true,
-      handler(){
-        this.tipChange();
-      }
-    }
   },
   methods:{
-    changeColor(val){
-      if(this.selected == 'bg'){
-        if(this.color){
-          this.color.mix(val);
-        }else{
-          this.color = new Color(val.hex);
-        }
-      } else if(this.selected == 'line'){
-        if(this.lineColor){
-          this.lineColor.mix(val);
-        }else{
-          this.lineColor = new Color(val.hex);
-        }
-      }
-    },
-    toggleColor(){
-      if(this.selected == 'bg'){
-        if(this.color){
-          this.color = null;
-        }else{
-          this.color = new Color("000000");
-        }
-      }
-      this.selected = 'bg';
-    },
-    toggleLine(){
-      if(this.selected == 'line'){
-        if(this.lineColor){
-          this.lineColor = null;
-        }else{
-          this.lineColor = new Color("000000");
-        }
-      }
-      this.selected = 'line';
-    },
     save(){
       const workerStr = WorkerGIF.default;
       const blob = new Blob([workerStr], {
@@ -175,8 +98,36 @@ export default {
       gif.on('finished', function(_gifblob){
         window.open(URL.createObjectURL(_gifblob));
       })
-
+    }
+  }
+  /*
+  data: function(){
+    return{
+      coloring: false,
+      timelineShow: true,
+      palletShow: false,
+      refOpen: false,
+      fMax: 3,
+      curPos: null,
+      md: false,
+      armShow: true,
+    }
+  },
+  watch:{
+    color:{
+      deep:true,
+      handler(){
+        this.tipChange();
+      }
     },
+    lineColor:{
+      deep:true,
+      handler(){
+        this.tipChange();
+      }
+    }
+  },
+  methods:{
     camera(){
       if (navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ video: true })
@@ -205,27 +156,12 @@ export default {
       gsap.to('#refImg', 1, {top: 10, delay: delay});
       this.refOpen = true;
     },
-    tipChange(){
-      const ctxt = this.$refs.linetip.getContext('2d');
-      ctxt.drawImage(this.tipImg, 0, 0);
-      ctxt.fillStyle = this.lineColor ? "#"+this.lineColor.hex : "";
-
-      ctxt.globalCompositeOperation = "source-in";
-      ctxt.fillRect(0,0,14,14);
-
-      const ctx = this.$refs.tip.getContext('2d');
-      ctx.drawImage(this.tipImg, 0, 0);
-      ctx.fillStyle = this.color ? "#"+this.color.hex : "";
-
-      ctx.globalCompositeOperation = "source-in";
-      ctx.fillRect(0,0,14,14);
-    }
   },
   mounted(){
     let paintPos, palletPos;
     this.$nextTick(() => {
       this.fMax = this.$refs.timeline.frameMax;
-      
+
 
       this.$refs.canContainer.style.marginTop = (window.innerHeight/2) - 250  + "px";
       paintPos = this.$refs.paintCan.$el.getBoundingClientRect()
@@ -280,7 +216,7 @@ html, body{
     }
     #middle{
       position: relative;
-      width: 500px;
+      width: 440px;
       height: 100%;
       flex: 1;
       display: flex;
@@ -300,7 +236,7 @@ html, body{
     top: -230px;
     border: 2px solid;
     }
-  
+
     #paintCan{
       background-color:#FFF;
       position: absolute;
@@ -310,35 +246,6 @@ html, body{
       position: absolute;
       bottom: -50px;
       }
-      .palletCol{
-        min-width: 10px;
-        flex:1;
-        box-sizing: border-box;
-        z-index: 9998;
-        }
-
-
-      .colPrev{
-        border: 1px solid;
-        box-sizing: border-box;
-        text-align: center;
-        cursor: pointer;
-        padding: 3px;
-        }
-        .colPrev div{
-          width: 50px;
-          height: 50px;
-        }
-        .cur{
-          border: 3px solid #F00;
-        }
-
-        .X{
-          display: inline-block;
-          color:#F00;
-          margin-top: 5px;
-          font-size: 40px;
-        }
         .disabled{
           opacity: .2;
         }

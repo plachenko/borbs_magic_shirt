@@ -19,27 +19,17 @@ export default {
       type: Number,
       default: 0
     },
-    curPos: {
-      type: Object,
-      default: function(){
-        return null;
-      }
-    },
-    lineColor: {
-      type: String,
-      default: null
-    },
-    color: {
-      type: String,
-      default: "000000"
-    }
   },
   data: function(){
     return{
+      md: false,
+      color: "000000",
+      lineColor: null,
+      curPos: null,
       fpnt: null,
       points: [],
       strokes: [],
-      frameN: 0
+      frameN: 0,
     }
   },
   watch:{
@@ -120,10 +110,13 @@ export default {
         }
       });
     },
-    drawStrokes(){
+    drawBG(){
       const underCan = this.$refs.can[0].getContext('2d');
       underCan.fillStyle = "#FFF";
       underCan.fillRect(0,0,this.$refs.can[0].width, this.$refs.can[0].height);
+    },
+    drawStrokes(){
+      this.drawBG();
 
       this.strokes.forEach((stroke)=>{
         if(stroke.points[this.frameN]){
@@ -165,13 +158,72 @@ export default {
         ctx.fillRect(point.x, point.y, 10, 10);
       });
       */
+    },
+    renderCan(){
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const _h = Math.round(h/1.6);
+      let _wh = _h;
+
+      if(_wh > 412){
+        _wh = 415;
+      }
+
+      document.getElementById('canvasImg').style.height = _h +"px";
+      this.$refs.can.forEach((el)=>{
+        el.height = _wh;
+      })
+      this.$refs.canContainer.style.marginTop = (window.innerHeight/2) - 250  + "px";
     }
   },
   mounted(){
-    EventBus.$on('frameChange', this.frameChange);
-    this.$nextTick(() => {
-      this.$refs.canContainer.style.marginTop = (window.innerHeight/2) - 250  + "px";
+
+    EventBus.$on('color', (c) => {
+      if(c){
+        this.color = c.hex;
+      }else{
+        this.color = null;
+      }
     });
+
+    EventBus.$on('lineColor', (c) => {
+      console.log(c);
+      if(c){
+        this.lineColor = c.hex;
+      }else{
+        this.lineColor = null;
+      }
+    });
+
+    this.$nextTick(() => {
+      this.renderCan();
+      this.drawBG();
+    });
+
+    EventBus.$on('resize', this.renderCan);
+
+    EventBus.$on('pDn', (e) => {
+      this.md = true;
+    });
+
+    EventBus.$on('pUp', (e) => {
+      this.md = false;
+    });
+
+    EventBus.$on('pMv', (e) => {
+      const cont = document.getElementById('canvasContainer');
+      const paintPos = cont.getBoundingClientRect();
+      const x = Math.round(e.offsetX - paintPos.x);
+      const y = Math.round(e.offsetY - paintPos.y);
+
+      if(this.md){
+        this.curPos = {x: x, y: y};
+      }else{
+        this.curPos = null;
+      }
+
+    });
+    EventBus.$on('frameChange', this.frameChange);
   }
 }
 </script>
@@ -180,13 +232,17 @@ canvas{
   position: absolute;
   top: 0px;
   left: 0px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
   }
 
   #canvasContainer{
-    width: 442px;
+    width: 440px;
     position: relative;
     height: 100%;
-    margin-top: 60px;
+    background-size: 385px 100%;
+    background-repeat: no-repeat;
+    background-position: center;
     background-image: url('../assets/canvasBot.png');
     align-self: center;
     }
@@ -194,9 +250,11 @@ canvas{
     position: absolute;
     z-index: 9995;
     background-image: url('../assets/canvas.png');
-    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-size: contain;
     width: 100%;
-    height: 449px;
-    background-color:#FFF;
+    min-height: 60%;
+    max-height: 100%;
     }
 </style>

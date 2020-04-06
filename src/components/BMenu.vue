@@ -1,6 +1,14 @@
 <template>
   <div id="menu">
-    <a v-for="(opt, idx) in menuItems" :key="idx" @click="opt.method">{{opt.name}}</a>
+    <a v-for="(opt, idx) in menuItems" :key="idx" @click="opt.method">
+      <div class="imgBtn" v-if="opt.name == 'Brush'">
+        <img  src="../assets/tip.png" alt="">
+      </div>
+      <div class="imgBtn" v-else-if="opt.name == 'Zoom'">
+        <img src="../assets/magnifying.png" alt="">
+      </div>
+      <span style="display: inline-block; height: 10px; width: 70px;" v-else>{{opt.name}}</span>
+    </a>
     <!--
     <div id="menu">
       <a href="#" @click="save">Save</a>
@@ -19,9 +27,10 @@ export default {
   data: function(){
     return{
       menuItems: [
-        { name: 'test', method: this.testM },
-        { name: 'test', method: this.testM },
-        { name: 'test', method: this.testM },
+        { name: 'Save', method: this.testM },
+        { name: 'Brush', method: this.testM },
+        { name: 'Zoom', method: this.testM },
+        { name: 'Load', method: this.testM },
       ]
     }
   },
@@ -41,16 +50,34 @@ export default {
   border: 2px solid;
   border-top: none;
   z-index: 9999;
+  /* margin-top: -6px; */
   }
+  #menu img{
+    height: 20px;
+    width: 20px;
+    position: absolute;
+    top: 8px;
+    left: 15px;
+  }
+  #menu .imgBtn{
+    width: 30px;
+    /* height: 30px; */
+    }
+  #menu .imgBtn div{
+    height: 30px;
+    padding: 10px 0px;
+    }
   #menu a{
+    position:relative;
     display: inline-block;
-    width: 70px;
     text-align: center;
     text-decoration: none;
     font-weight: bold;
     color:#000;
     border-left: 2px solid;
     padding: 10px 10px;
+    vertical-align: bottom;
+    height: 20px;
     }
     #menu a:hover{
       background-color:#000;
