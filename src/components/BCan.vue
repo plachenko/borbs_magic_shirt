@@ -174,6 +174,7 @@ export default {
         el.height = _wh;
       })
       this.$refs.canContainer.style.marginTop = (window.innerHeight/2) - 250  + "px";
+      this.drawStrokes();
     }
   },
   mounted(){
@@ -204,10 +205,12 @@ export default {
 
     EventBus.$on('pDn', (e) => {
       this.md = true;
+      console.log(e);
     });
 
     EventBus.$on('pUp', (e) => {
       this.md = false;
+      console.log(e);
     });
 
     EventBus.$on('pMv', (e) => {
@@ -219,6 +222,7 @@ export default {
       if(this.md){
         this.curPos = {x: x, y: y};
       }else{
+        this.points = [];
         this.curPos = null;
       }
 

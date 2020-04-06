@@ -21,6 +21,16 @@ export default {
       return false;
     });
 
+    capRef.addEventListener('touchstart', (e) => {
+      this.md = true;
+      EventBus.$emit('pDn', e);
+    });
+
+    capRef.addEventListener('touchend', (e) => {
+      this.md = false;
+      EventBus.$emit('pUp', e);
+    });
+
     capRef.addEventListener('pointerup', (e) => {
       this.md = false;
       EventBus.$emit('pUp', e);
