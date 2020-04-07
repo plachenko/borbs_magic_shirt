@@ -188,7 +188,6 @@ export default {
     });
 
     EventBus.$on('lineColor', (c) => {
-      console.log(c);
       if(c){
         this.lineColor = c.hex;
       }else{
@@ -205,12 +204,17 @@ export default {
 
     EventBus.$on('pDn', (e) => {
       this.md = true;
-      console.log(e);
     });
 
     EventBus.$on('pUp', (e) => {
       this.md = false;
-      console.log(e);
+      if(e.touches){
+        this.pntDn = false;
+        this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
+        this.points = [];
+        this.fpnt = null;
+        this.drawStrokes();
+      }
     });
 
     EventBus.$on('pMv', (e) => {
@@ -222,7 +226,6 @@ export default {
       if(this.md){
         this.curPos = {x: x, y: y};
       }else{
-        this.points = [];
         this.curPos = null;
       }
 
@@ -252,7 +255,7 @@ canvas{
     }
   #canvasImg{
     position: absolute;
-    z-index: 9995;
+    z-index: 9975;
     background-image: url('../assets/canvas.png');
     background-position: center top;
     background-repeat: no-repeat;

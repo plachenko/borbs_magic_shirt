@@ -112,7 +112,7 @@ export default {
   top: 0px;
   width: 100%;
   height: 100%;
-  z-index: 9998;
+  z-index: 9990;
   cursor: none;
   }
 </style>

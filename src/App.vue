@@ -8,6 +8,9 @@
       https://www.twitch.tv/tomthinks
     -->
 
+    <!-- Modal that appears for extras -->
+    <BModal :modalOpts="modalOpts" v-if="modalOpts" @exit="modalExit" />
+
     <!-- The Event Capture -->
     <BEvent />
 
@@ -21,7 +24,7 @@
         <!-- <div id="refImg" ref="refImg"></div> -->
 
         <!-- Menu items. -->
-        <BMenu />
+        <BMenu @modalShow="modalShow($event)" />
 
         <!-- Paint Canvas -->
         <BCan />
@@ -49,6 +52,7 @@ import BEvent from './components/BEvent';
 import BMenu from './components/BMenu';
 import BCan from './components/BCan';
 import BPallet from './components/BPallet';
+import BModal from './components/BModal';
 
 export default {
   name: 'App',
@@ -57,14 +61,26 @@ export default {
     BMenu,
     BPallet,
     BEvent,
-    BSleeve
+    BSleeve,
+    BModal
   },
   mounted(){
     EventBus.$on('pDn', (e)=>{
       // console.log(e);
     })
   },
+  data: function(){
+    return{
+      modalOpts: null
+    }
+  },
   methods:{
+    modalShow(opts){
+      this.modalOpts = opts;
+    },
+    modalExit(){
+      this.modalOpts = null;
+    },
     save(){
       const workerStr = WorkerGIF.default;
       const blob = new Blob([workerStr], {
@@ -189,6 +205,7 @@ export default {
 <style>
 *{
   user-select: none;
+  overscroll-behavior: none;
 }
 html, body{
   margin: 0px;

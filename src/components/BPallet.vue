@@ -1,6 +1,6 @@
 <template>
   <div style="position: relative;">
-    <div @click="toggleColor" style="z-index: 9998; position: absolute; top: -90px; left: 30px;">
+    <div @click="toggleColor" style="z-index: 9991; position: absolute; top: -90px; left: 30px;">
       Fill
       <div :class="{cur: selected == 'bg'}" class="colPrev">
         <span v-show="!color" class="X">X</span>
@@ -8,7 +8,7 @@
       </div>
     </div>
 
-    <div @click="toggleLine" style="z-index: 9998; position: absolute; top: -90px; right: 30px;">
+    <div @click="toggleLine" style="z-index: 9991; position: absolute; top: -90px; right: 30px;">
       Stroke
       <div :class="{cur: selected == 'line'}" class="colPrev">
         <span v-show="!lineColor" class="X">X</span>
@@ -114,7 +114,7 @@ export default {
       let w = window.innerWidth;
 
       if(w > 500){
-        w = w / 2;
+        w = 500;
       }
 
       document.getElementById('palletImg').style.width = w + "px";
@@ -128,7 +128,7 @@ export default {
   min-width: 10px;
   flex:1;
   box-sizing: border-box;
-  z-index: 9998;
+  z-index: 9991;
   }
 
 

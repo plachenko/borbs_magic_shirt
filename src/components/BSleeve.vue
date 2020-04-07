@@ -1,8 +1,8 @@
 <template>
   <div ref="brush" id="brush">
-    <canvas :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9994;"/>
-    <canvas id="lineTip" :style="{opacity: !lineColor ? 0 : 1}" width="26" height="19" ref="linetip" style="left: -2px; position: absolute; z-index:9993;"/>
-    <img :class="{disabled: !color}" ref="tipBG" style="left: 0px; position: absolute;z-index: 9993;" src="../assets/tip.png" id="tip" />
+    <canvas :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9989;"/>
+    <canvas id="lineTip" :style="{opacity: !lineColor ? 0 : 1}" width="26" height="19" ref="linetip" style="left: -2px; position: absolute; z-index:9988;"/>
+    <img :class="{disabled: !color}" ref="tipBG" style="left: 0px; position: absolute;z-index: 9983;" src="../assets/tip.png" id="tip" />
     <img src="../assets/brush.png" style="left: 20px; position: absolute;" />
     <div id="sleeve" />
   </div>
@@ -118,7 +118,7 @@ export default {
 <style>
   #brush{
     position: absolute;
-    z-index: 9997;
+    z-index: 9987;
     background-repeat: repeat-x;
     color:#000;
     position: absolute;
