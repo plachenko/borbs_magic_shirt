@@ -14,31 +14,23 @@ export default {
   data: function(){
     return{
       palletShow: false,
-      tipImg: null
-    }
-  },
-  props: {
-    color: {
-      type: String,
-      default: "000000"
-    },
-    lineColor: {
-      type: String,
-      default: "000000"
+      tipImg: null,
+      color: "000000",
+      lineColor: null
     }
   },
   methods:{
     tipChange(){
       const ctxt = this.$refs.linetip.getContext('2d');
       ctxt.drawImage(this.tipImg, 0, 0);
-      ctxt.fillStyle = this.lineColor ? "#"+this.lineColor.hex : "";
+      ctxt.fillStyle = this.lineColor ? "#"+this.lineColor : "";
 
       ctxt.globalCompositeOperation = "source-in";
       ctxt.fillRect(0,0,14,14);
 
       const ctx = this.$refs.tip.getContext('2d');
       ctx.drawImage(this.tipImg, 0, 0);
-      ctx.fillStyle = this.color ? "#"+this.color.hex : "";
+      ctx.fillStyle = this.color ? "#"+this.color : "";
 
       ctx.globalCompositeOperation = "source-in";
       ctx.fillRect(0,0,14,14);
@@ -56,6 +48,23 @@ export default {
   mounted(){
     const w = window.innerWidth;
     const h = window.innerHeight;
+    EventBus.$on('color', (c) => {
+      if(c){
+        this.color = c.hex;
+      }else{
+        this.color = null;
+      }
+      this.tipChange();
+    });
+
+    EventBus.$on('lineColor', (c) => {
+      if(c){
+        this.lineColor = c.hex;
+      }else{
+        this.lineColor = null;
+      }
+      this.tipChange();
+    });
     this.$nextTick(() => {
       this.tipImg = document.getElementById('tip');
       this.tipImg.onload = () => {
@@ -134,6 +143,12 @@ export default {
       left: 143px;
       top: 73px;
       background-color:#FFF;
+    }
+    .disabled{
+      opacity: .2;
+    }
+    #lineTip .disabled{
+      opacity: 0 !important;
     }
 
 </style>

@@ -2,7 +2,8 @@
   <div id="menu">
     <a v-for="(opt, idx) in menuItems" :key="idx" @click="opt.method">
       <div class="imgBtn" v-if="opt.name == 'Play'">
-        <img src="../assets/media-play.png" alt="">
+        <img v-if="playing" src="../assets/media-pause.png" alt="">
+        <img v-else src="../assets/media-play.png" alt="">
       </div>
       <div class="imgBtn" v-else-if="opt.name == 'Brush'">
         <img  src="../assets/tip.png" alt="">
@@ -25,13 +26,16 @@
   </div>
 </template>
 <script>
+import EventBus from '../Eventbus';
 export default {
   name:'BMenu',
   data: function(){
     return{
+      current: '',
+      playing: true,
       menuItems: [
         { name: 'Save', method:  this.save },
-        { name: 'Play', method: this.testM },
+        { name: 'Play', method: this.playToggle },
         { name: 'Brush', method: this.testM },
         { name: 'Zoom', method: this.testM },
         { name: 'More', method: this.more }
@@ -57,27 +61,54 @@ export default {
   },
   methods:{
     more(){
-      const obj = {
-        title: "More",
-        items: [
-          {name: 'Clear', method: 'stuff'},
-          {name: 'Load', method: 'stuff'},
-          {name: 'Timeline', method: 'stuff'},
-          {name: 'Pallet', method: 'stuff'},
-        ]
-      };
-      this.$emit('modalShow', obj);
+      if(this.current == 'more'){
+        this.$emit('modalShow', null);
+        this.current = '';
+      }else{
+        this.current = 'more';
+        const obj = {
+          title: "More",
+          items: [
+            {name: 'Clear', method: 'clearCan'},
+            {name: 'Load', method: 'loadRef'},
+            {name: 'Timeline', method: 'stuff'},
+            // {name: 'Pallet', method: 'stuff'},
+          ]
+        };
+        this.$emit('modalShow', obj);
+      }
     },
     save(){
-      const obj = {
-        title: "Save",
-        items: [
-          {name: 'Output Scale', method: 'stuff', type: 'number'},
-          {name: 'Save GIF', method: 'stuff'},
-          {name: 'Save Frame to PNG', method: 'stuff'}
-        ]
-      };
-      this.$emit('modalShow', obj);
+      if(this.current == 'save'){
+        this.$emit('modalShow', null);
+        this.current = '';
+      }else{
+        this.current = 'save';
+        const obj = {
+          title: "Save",
+          items: [
+            /*
+            {
+              name: 'Output Scale',
+              max: 5,
+              min: .1,
+              step: '.1',
+              model: this.saveNum,
+              type: 'number'
+            },
+            */
+            {name: 'Save GIF', method: 'saveGIF'},
+            {name: 'Save Frame to PNG', method: 'savePNG'}
+          ]
+        };
+        this.$emit('modalShow', obj);
+      }
+    },
+    playToggle(){
+      this.playing = !this.playing;
+      EventBus.$emit('playToggle');
+      this.$emit('modalShow', null);
+      this.current = '';
     },
     testM(){
       console.log('hi');
@@ -123,8 +154,8 @@ export default {
     height: 20px;
     }
     #menu a:hover{
-      background-color:#000;
-      color: #FFF;
+      background-color:#CCC;
+      color: #000;
       }
     #menu a:first-child{
       border-radius: 0px 0px 0px 15px;

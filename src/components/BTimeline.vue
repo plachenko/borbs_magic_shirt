@@ -28,7 +28,7 @@ export default {
       frameNum: 0,
       frameMax: 3,
       rec: false,
-      playing: false
+      playing: true
     }
   },
   watch:{
@@ -84,6 +84,9 @@ export default {
     }
   },
   mounted(){
+    EventBus.$on('playToggle', (v) => {
+      this.togglePlay();
+    })
     document.addEventListener('keydown', (e)=>{
       if(e.which == 32){
         this.togglePlay();

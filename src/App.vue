@@ -11,11 +11,16 @@
     <!-- Modal that appears for extras -->
     <BModal :modalOpts="modalOpts" v-if="modalOpts" @exit="modalExit" />
 
+    <div id="refImg" ref="refImg" />
+    <input type="file" ref="file" @change="load" style="display:none" />
+
     <!-- The Event Capture -->
     <BEvent />
 
     <!-- Borb's shirt sleeve. -->
     <BSleeve />
+
+    <BTimeline ref="timeline" />
 
     <!-- Middle Container -->
     <div id="container">
@@ -24,10 +29,10 @@
         <!-- <div id="refImg" ref="refImg"></div> -->
 
         <!-- Menu items. -->
-        <BMenu @modalShow="modalShow($event)" />
+        <BMenu ref="menu" @modalShow="modalShow($event)" @modalExit="modalExit" />
 
         <!-- Paint Canvas -->
-        <BCan />
+        <BCan ref="paintCan" />
         <!-- <BCan :frameMax="fMax" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" /> -->
 
         <!-- Paint Pallet -->
@@ -36,11 +41,13 @@
       </div>
     </div>
 
+    <canvas ref="render" width="420" height="420" style="display: none;" />
+
   </div>
 </template>
 
 <script>
-// import gsap from 'gsap';
+import gsap from 'gsap';
 
 // eslint-disable-next-line
 import GIF from './assets/js/gif.js';
@@ -53,6 +60,7 @@ import BMenu from './components/BMenu';
 import BCan from './components/BCan';
 import BPallet from './components/BPallet';
 import BModal from './components/BModal';
+import BTimeline from './components/BTimeline';
 
 export default {
   name: 'App',
@@ -62,11 +70,16 @@ export default {
     BPallet,
     BEvent,
     BSleeve,
-    BModal
+    BModal,
+    BTimeline
   },
   mounted(){
+    EventBus.$on('clearCan', this.modalExit );
+    EventBus.$on('saveGIF', this.saveGIF );
+    EventBus.$on('savePNG', this.savePNG );
+    EventBus.$on('loadRef', this.$refs.file.click );
     EventBus.$on('pDn', (e)=>{
-      // console.log(e);
+      //
     })
   },
   data: function(){
@@ -79,9 +92,17 @@ export default {
       this.modalOpts = opts;
     },
     modalExit(){
+      this.$refs.menu.current = '';
       this.modalOpts = null;
     },
-    save(){
+    savePNG(){
+      const canRef = this.$refs.paintCan;
+      const canLyr = canRef.$refs.can[0];
+      const renderCan = this.$refs.render;
+      const url = canLyr.toDataURL("image/png").replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+      window.open(url, '_blank')
+    },
+    saveGIF(){
       const workerStr = WorkerGIF.default;
       const blob = new Blob([workerStr], {
           type: 'application/javascript'
@@ -114,6 +135,23 @@ export default {
       gif.on('finished', function(_gifblob){
         window.open(URL.createObjectURL(_gifblob));
       })
+    },
+    load(e){
+      const target = e.target.files;
+      const url = URL.createObjectURL(target[0])
+      let delay = 0;
+
+      if(this.refOpen){
+        delay = 1.5
+        gsap.to('#refImg', 1, {top: -230});
+      }
+
+      setTimeout(() => {
+        this.$refs.refImg.style.backgroundImage = "url(" + url + ")";
+      }, delay * 1000);
+
+      gsap.to('#refImg', 1, {top: 10, delay: delay});
+      this.refOpen = true;
     }
   }
   /*
@@ -155,24 +193,6 @@ export default {
         });
       }
     },
-    load(e){
-      const target = e.target.files;
-      const url = URL.createObjectURL(target[0])
-      let delay = 0;
-
-      if(this.refOpen){
-        delay = 1.5
-        gsap.to('#refImg', 1, {top: -230});
-      }
-
-      setTimeout(() => {
-        this.$refs.refImg.style.backgroundImage = "url(" + url + ")";
-      }, delay * 1000);
-
-      gsap.to('#refImg', 1, {top: 10, delay: delay});
-      this.refOpen = true;
-    },
-  },
   mounted(){
     let paintPos, palletPos;
     this.$nextTick(() => {

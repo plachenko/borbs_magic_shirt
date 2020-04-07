@@ -8,10 +8,18 @@
         <div v-for="(opt, idx) in modalOpts.items" :key="idx" class="modalOpts">
 
           <div v-if="opt.type">
-            {{opt.name}} <input :type="opt.type" />
+            {{opt.name}}
+            <input
+              v-if="opt.type == 'number'"
+              :type="opt.type"
+              :min="opt.min || 0"
+              :max="opt.max || 100"
+              :step="opt.step || 1"
+              style="width: 40px;"
+              :v-model='opt.model' />
           </div>
 
-          <div v-else class="modalBtn">
+          <div v-else class="modalBtn" @click="optionEmit(opt.method)">
             {{opt.name}}
           </div>
 
@@ -21,8 +29,15 @@
   </div>
 </template>
 <script>
+import EventBus from '../Eventbus';
+
 export default {
   name: 'BModal',
+  data: function(){
+    return{
+      saveNum: 1
+    }
+  },
   props: {
     modalOpts:{
       type: Object,
@@ -34,6 +49,9 @@ export default {
   methods:{
     exit(){
       this.$emit('exit');
+    },
+    optionEmit(name){
+      EventBus.$emit(name)
     }
   }
 }
@@ -90,12 +108,15 @@ export default {
         color:#FFF;
       }
 
-    .modalOpts:first-child{
+    .modalOpts:first-child .modalBtn{
       border-radius: 20px 20px 0px 0px;
     }
 
     .modalOpts:last-child{
       border-bottom: none;
+    }
+
+    .modalOpts:last-child .modalBtn{
       border-radius: 0px 0px 20px 20px;
     }
 

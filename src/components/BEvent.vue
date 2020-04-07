@@ -23,7 +23,9 @@ export default {
 
     capRef.addEventListener('touchstart', (e) => {
       this.md = true;
-      EventBus.$emit('pDn', e);
+      if(e.touches.length == 1){
+        EventBus.$emit('pDn', e.touches[0]);
+      }
     });
 
     capRef.addEventListener('touchend', (e) => {

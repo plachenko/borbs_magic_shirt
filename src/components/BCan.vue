@@ -94,9 +94,12 @@ export default {
     clearAll(){
       this.strokes = [];
 
+      this.drawStrokes();
+      /*
       for(const i in this.$refs.can){
         this.clear(i);
       }
+      */
     },
     clear(idx){
       const can = this.$refs.can[idx];
@@ -231,6 +234,7 @@ export default {
 
     });
     EventBus.$on('frameChange', this.frameChange);
+    EventBus.$on('clearCan', this.clearAll);
   }
 }
 </script>
