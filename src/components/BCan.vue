@@ -22,6 +22,8 @@ export default {
   },
   data: function(){
     return{
+      zoom: false,
+      palletShow: false,
       md: false,
       color: "000000",
       lineColor: null,
@@ -35,7 +37,11 @@ export default {
   watch:{
     curPos(pnt){
       this.clear(1);
-      if(pnt){
+      if(pnt && !this.zoom){
+        if(this.palletShow){
+          EventBus.$emit('palletShow', false);
+        }
+
         if(!this.pntDn){
           this.fpnt = Object.assign({}, pnt);
           this.pntDn = true;
@@ -47,30 +53,6 @@ export default {
 
         this.points[this.frameN].push(pnt);
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
-        /*
-        const last = this.points[this.frameN - 1];
-        let lastEl;
-
-        if(last){
-          lastEl = last[last.length-1];
-        }else if(this.points[this.frameMax]){
-          lastEl = this.points[this.frameMax][this.points.length-1];
-        }
-
-        if(this.points[this.frameN]){
-          if(lastEl){
-            this.points[this.frameN].push(lastEl);
-          }
-          this.points[this.frameN].push(pnt);
-        }else{
-          this.points[this.frameN] = [pnt];
-          if(lastEl){
-            this.points[this.frameN].unshift(lastEl);
-          }
-        }
-
-        this.draw(1, this.points[this.frameN], this.color, this.lineColor);
-        */
       }else{
         this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
@@ -95,6 +77,7 @@ export default {
       this.strokes = [];
 
       this.drawStrokes();
+      this.clear(1);
       /*
       for(const i in this.$refs.can){
         this.clear(i);
@@ -162,6 +145,27 @@ export default {
       });
       */
     },
+    zoomChange(){
+      let zoom;
+      if(this.zoomed){
+        this.zoomed = false;
+        zoom = .5;
+      }else{
+        this.zoomed = true;
+        zoom = 2;
+      }
+      this.strokes.forEach((stroke)=>{
+        for(let f = 0; f <= this.frameMax; f++){
+          if(stroke.points[f]){
+            stroke.points[f].forEach((pnt) => {
+              pnt.x = pnt.x *zoom;
+              pnt.y = pnt.y *zoom;
+            });
+          }
+        }
+      })
+      this.drawStrokes();
+    },
     renderCan(){
       const w = window.innerWidth;
       const h = window.innerHeight;
@@ -181,6 +185,10 @@ export default {
     }
   },
   mounted(){
+
+    EventBus.$on('palletShown', (v) => {
+      this.palletShow = v;
+    });
 
     EventBus.$on('color', (c) => {
       if(c){
@@ -206,6 +214,9 @@ export default {
     EventBus.$on('resize', this.renderCan);
 
     EventBus.$on('pDn', (e) => {
+      if(this.zoom){
+        this.zoomChange();
+      }
       this.md = true;
     });
 
@@ -235,6 +246,13 @@ export default {
     });
     EventBus.$on('frameChange', this.frameChange);
     EventBus.$on('clearCan', this.clearAll);
+    EventBus.$on('toolToggle', (tool) => {
+      if(tool == 'Zoom'){
+        this.zoom = true;
+      }else{
+        this.zoom = false;
+      }
+    });
   }
 }
 </script>

@@ -1,6 +1,10 @@
 <template>
-  <div style="position: relative;">
-    <div @click="toggleColor" style="z-index: 9991; position: absolute; top: -90px; left: 30px;">
+  <div id="palletContainer" v-if="!zoom">
+    <div style="position: relative; place-content: center; display:flex; height: 30px;">
+      <div id="palletToggle" @click="showPallet" />
+    </div>
+
+    <div class="preview" @click="toggleColor" style="z-index: 9991; position: absolute; top: -55px; left: 30px;">
       Fill
       <div :class="{cur: selected == 'bg'}" class="colPrev">
         <span v-show="!color" class="X">X</span>
@@ -8,7 +12,7 @@
       </div>
     </div>
 
-    <div @click="toggleLine" style="z-index: 9991; position: absolute; top: -90px; right: 30px;">
+    <div class="preview" @click="toggleLine" style="z-index: 9991; position: absolute; top: -55px; right: 30px;">
       Stroke
       <div :class="{cur: selected == 'line'}" class="colPrev">
         <span v-show="!lineColor" class="X">X</span>
@@ -28,6 +32,7 @@
   </div>
 </template>
 <script>
+import gsap from 'gsap';
 import Color from '../classes/Color';
 import EventBus from '../Eventbus';
 export default {
@@ -46,8 +51,10 @@ export default {
   */
   data: function(){
     return{
+      zoom: false,
       selected: 'bg',
       color: new Color('000000'),
+      palletShow: true,
       lineColor: null,
       colors:[
         new Color('000000'),
@@ -85,6 +92,20 @@ export default {
         EventBus.$emit('lineColor', this.lineColor);
       }
     },
+    hidePallet(){
+      gsap.to('#palletToggle', {autoAlpha: 1});
+      gsap.to('.preview', {autoAlpha: 0});
+      gsap.to('#palletContainer', {bottom: -50, onComplete:() => {
+        EventBus.$emit('palletShown', false);
+      }});
+    },
+    showPallet(){
+      gsap.to('#palletToggle', {autoAlpha: 0});
+      gsap.to('.preview', {autoAlpha: 1});
+      gsap.to('#palletContainer', {bottom: 0, onComplete: () => {
+        EventBus.$emit('palletShown', true);
+      }});
+    },
     toggleColor(){
       if(this.selected == 'bg'){
         if(this.color){
@@ -110,6 +131,31 @@ export default {
 
   },
   mounted(){
+    this.$refs.pallet.addEventListener('pointerup', (e) => {
+      EventBus.$emit('palletUp', e);
+    });
+    this.$refs.pallet.addEventListener('pointerdown', (e) => {
+      EventBus.$emit('palletDn', e);
+    });
+    this.$refs.pallet.addEventListener('pointermove', (e) => {
+      EventBus.$emit('palletMv', e);
+    });
+    EventBus.$on('toolToggle', (tool) => {
+      if(tool == 'Zoom'){
+        this.zoom = true;
+      }else{
+        this.zoom = false;
+      }
+    });
+    EventBus.$on('palletShow', (v) => {
+      if(v && !this.palletShow){
+        this.palletShow = true;
+        this.showPallet();
+      }else{
+        this.palletShow = false;
+        this.hidePallet();
+      }
+    })
     this.$nextTick(() => {
       let w = window.innerWidth;
 
@@ -124,6 +170,11 @@ export default {
 }
 </script>
 <style>
+#palletContainer{
+  position: absolute;
+  bottom: -50px;
+}
+
 .palletCol{
   min-width: 10px;
   flex:1;
@@ -154,6 +205,25 @@ export default {
     margin-top: 5px;
     left: 15px;
     font-size: 40px;
+  }
+
+  #palletToggle{
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background-color:#FFF;
+    background-image: url('../assets/palletIcon.jpg');
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: -30px;
+    border: 2px solid;
+    z-index: 9991;
+    cursor: pointer;
+  }
+  .preview{
+    opacity: 0;
   }
 
 </style>

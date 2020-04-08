@@ -5,24 +5,15 @@
         <img v-if="playing" src="../assets/media-pause.png" alt="">
         <img v-else src="../assets/media-play.png" alt="">
       </div>
-      <div class="imgBtn" v-else-if="opt.name == 'Brush'">
-        <img  src="../assets/tip.png" alt="">
+      <div class="imgBtn" v-else-if="opt.name == 'Brush' || opt.name == 'Zoom'">
+        <img v-if="opt.name == 'Brush'" src="../assets/brushIcon.png" alt="">
+        <img v-else-if="opt.name == 'Zoom'" src="../assets/magIcon.png" alt="">
       </div>
-      <div class="imgBtn" v-else-if="opt.name == 'Zoom'">
-        <img src="../assets/magnifying.png" alt="">
+      <div class="imgBtn" v-else-if="opt.name == 'Timeline'">
+        <img src="../assets/clockIcon.png" alt="">
       </div>
       <span style="display: inline-block; height: 10px; width: 70px;" v-else>{{opt.name}}</span>
     </a>
-    <!--
-    <div id="menu">
-      <a href="#" @click="save">Save</a>
-      <a href="#" @click="$refs.paintCan.clearAll()">Clear</a>
-      <a href="#" @click="timelineShow = !timelineShow">Timeline</a>
-      <input type="file" ref="file" @change="load" style="display:none" />
-      <a href="#" @click="$refs.file.click()" style="border-radius: 0px 0px 15px 0px">Load</a>
-      <BTimeline :curPos="curPos" ref="timeline" v-show="timelineShow" />
-    </div>
-    -->
   </div>
 </template>
 <script>
@@ -36,8 +27,8 @@ export default {
       menuItems: [
         { name: 'Save', method:  this.save },
         { name: 'Play', method: this.playToggle },
-        { name: 'Brush', method: this.testM },
-        { name: 'Zoom', method: this.testM },
+        { name: 'Zoom', method: this.toolToggle },
+        { name: 'Timeline', method: this.timelineToggle },
         { name: 'More', method: this.more }
       ]
     }
@@ -45,7 +36,6 @@ export default {
   mounted(){
     const w = window.innerWidth;
     /*
-    console.log(w);
     if(w < 400){
       this.menuItems.push(
         { name: 'Clear', method: this.testM },
@@ -69,9 +59,8 @@ export default {
         const obj = {
           title: "More",
           items: [
-            {name: 'Clear', method: 'clearCan'},
             {name: 'Load', method: 'loadRef'},
-            {name: 'Timeline', method: 'stuff'},
+            {name: 'Clear', method: 'clearCan'},
             // {name: 'Pallet', method: 'stuff'},
           ]
         };
@@ -104,11 +93,25 @@ export default {
         this.$emit('modalShow', obj);
       }
     },
+    timelineToggle(){
+      EventBus.$emit('timelineToggle');
+    },
     playToggle(){
       this.playing = !this.playing;
       EventBus.$emit('playToggle');
+      // this.$emit('modalShow', null);
+      // this.current = '';
+    },
+    toolToggle(){
       this.$emit('modalShow', null);
       this.current = '';
+      if(this.menuItems[2].name == "Zoom"){
+        this.menuItems[2].name = "Brush"
+        EventBus.$emit('toolToggle', 'Zoom');
+      }else{
+        this.menuItems[2].name = "Zoom"
+        EventBus.$emit('toolToggle', 'Brush');
+      }
     },
     testM(){
       console.log('hi');

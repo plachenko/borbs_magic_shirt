@@ -11,7 +11,6 @@
     <!-- Modal that appears for extras -->
     <BModal :modalOpts="modalOpts" v-if="modalOpts" @exit="modalExit" />
 
-    <div id="refImg" ref="refImg" />
     <input type="file" ref="file" @change="load" style="display:none" />
 
     <!-- The Event Capture -->
@@ -20,16 +19,16 @@
     <!-- Borb's shirt sleeve. -->
     <BSleeve />
 
-    <BTimeline ref="timeline" />
 
     <!-- Middle Container -->
     <div id="container">
       <div id="middle">
         <!-- Reference Image that loads -->
-        <!-- <div id="refImg" ref="refImg"></div> -->
+        <div id="refImg" ref="refImg"></div>
 
         <!-- Menu items. -->
         <BMenu ref="menu" @modalShow="modalShow($event)" @modalExit="modalExit" />
+        <BTimeline ref="timeline" v-show="timelineShow" />
 
         <!-- Paint Canvas -->
         <BCan ref="paintCan" />
@@ -74,20 +73,25 @@ export default {
     BTimeline
   },
   mounted(){
+    EventBus.$on('timelineToggle', () =>{
+      this.timelineShow = !this.timelineShow;
+    });
     EventBus.$on('clearCan', this.modalExit );
     EventBus.$on('saveGIF', this.saveGIF );
     EventBus.$on('savePNG', this.savePNG );
-    EventBus.$on('loadRef', this.$refs.file.click );
-    EventBus.$on('pDn', (e)=>{
-      //
-    })
+    EventBus.$on('loadRef', this.loadRef );
   },
   data: function(){
     return{
+      timelineShow: false,
       modalOpts: null
     }
   },
   methods:{
+    loadRef(){
+      this.$refs.file.click();
+      console.log('load click.');
+    },
     modalShow(opts){
       this.modalOpts = opts;
     },
@@ -141,6 +145,7 @@ export default {
       const url = URL.createObjectURL(target[0])
       let delay = 0;
 
+      this.modalExit();
       if(this.refOpen){
         delay = 1.5
         gsap.to('#refImg', 1, {top: -230});
@@ -154,71 +159,6 @@ export default {
       this.refOpen = true;
     }
   }
-  /*
-  data: function(){
-    return{
-      coloring: false,
-      timelineShow: true,
-      palletShow: false,
-      refOpen: false,
-      fMax: 3,
-      curPos: null,
-      md: false,
-      armShow: true,
-    }
-  },
-  watch:{
-    color:{
-      deep:true,
-      handler(){
-        this.tipChange();
-      }
-    },
-    lineColor:{
-      deep:true,
-      handler(){
-        this.tipChange();
-      }
-    }
-  },
-  methods:{
-    camera(){
-      if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-        .then(function (stream) {
-          // video.srcObject = stream;
-        })
-        .catch(function (err) {
-          //
-        });
-      }
-    },
-  mounted(){
-    let paintPos, palletPos;
-    this.$nextTick(() => {
-      this.fMax = this.$refs.timeline.frameMax;
-
-
-      this.$refs.canContainer.style.marginTop = (window.innerHeight/2) - 250  + "px";
-      paintPos = this.$refs.paintCan.$el.getBoundingClientRect()
-    });
-
-    this.$refs.pallet.addEventListener('pointerdown', (e) => {
-      this.$refs.brush.style.bottom = 40 + 'px';
-    });
-    this.$refs.pallet.addEventListener('pointerup', (e) => {
-      this.$refs.brush.style.bottom = 75 + 'px';
-    });
-    this.$refs.pallet.addEventListener('pointermove', (e) => {
-      this.$refs.brush.style.width = (window.innerWidth - e.screenX) + 'px';
-      if(!e.pressure){
-        this.$refs.brush.style.left = e.screenX - 8 + 'px';
-        // this.$refs.brush.style.bottom = (Math.sin(e.screenX / 100 ) * -80) + 74 + 'px';
-      }
-    });
-
-  }
-*/
 }
 </script>
 
@@ -260,34 +200,17 @@ html, body{
       flex-flow: column;
       align-items: center;
       }
-/*
   #refImg{
     background-repeat: no-repeat;
     background-size: cover;
     width: 160px;
     height: 200px;
     position: absolute;
-    right: -120px;
+    right: -150px;
     z-index: 9997;
+    background-color:#FFF;
     box-sizing: border-box;
     top: -230px;
     border: 2px solid;
     }
-
-    #paintCan{
-      background-color:#FFF;
-      position: absolute;
-      }
-    #pallet{
-      background-color: #FFF;
-      position: absolute;
-      bottom: -50px;
-      }
-        .disabled{
-          opacity: .2;
-        }
-        #lineTip .disabled{
-          opacity: 0 !important;
-        }
-        */
 </style>

@@ -1,8 +1,9 @@
 <template>
   <div ref="brush" id="brush">
-    <canvas :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9989;"/>
-    <canvas id="lineTip" :style="{opacity: !lineColor ? 0 : 1}" width="26" height="19" ref="linetip" style="left: -2px; position: absolute; z-index:9988;"/>
-    <img :class="{disabled: !color}" ref="tipBG" style="left: 0px; position: absolute;z-index: 9983;" src="../assets/tip.png" id="tip" />
+    <canvas v-show="!zoom" :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9989;"/>
+    <canvas v-show="!zoom" id="lineTip" :style="{opacity: !lineColor ? 0 : 1}" width="26" height="19" ref="linetip" style="left: -2px; position: absolute; z-index:9988;"/>
+    <img v-if="zoom" :class="{disabled: !color}" style="left: -10px; top: -20px; position: absolute; z-index: 83;" src="../assets/magnifying.png" id="tip" />
+    <img v-else :class="{disabled: !color}" ref="tipBG" style="left: 0px; position: absolute;z-index: 9983;" src="../assets/tip.png" id="tip" />
     <img src="../assets/brush.png" style="left: 20px; position: absolute;" />
     <div id="sleeve" />
   </div>
@@ -13,6 +14,8 @@ export default {
   name: 'BSleeve',
   data: function(){
     return{
+      zoom: false,
+      sleeveDown: false,
       palletShow: false,
       tipImg: null,
       color: "000000",
@@ -21,19 +24,21 @@ export default {
   },
   methods:{
     tipChange(){
-      const ctxt = this.$refs.linetip.getContext('2d');
-      ctxt.drawImage(this.tipImg, 0, 0);
-      ctxt.fillStyle = this.lineColor ? "#"+this.lineColor : "";
+      if(!this.zoom){
+        const ctxt = this.$refs.linetip.getContext('2d');
+        ctxt.drawImage(this.tipImg, 0, 0);
+        ctxt.fillStyle = this.lineColor ? "#"+this.lineColor : "";
 
-      ctxt.globalCompositeOperation = "source-in";
-      ctxt.fillRect(0,0,14,14);
+        ctxt.globalCompositeOperation = "source-in";
+        ctxt.fillRect(0,0,14,14);
 
-      const ctx = this.$refs.tip.getContext('2d');
-      ctx.drawImage(this.tipImg, 0, 0);
-      ctx.fillStyle = this.color ? "#"+this.color : "";
+        const ctx = this.$refs.tip.getContext('2d');
+        ctx.drawImage(this.tipImg, 0, 0);
+        ctx.fillStyle = this.color ? "#"+this.color : "";
 
-      ctx.globalCompositeOperation = "source-in";
-      ctx.fillRect(0,0,14,14);
+        ctx.globalCompositeOperation = "source-in";
+        ctx.fillRect(0,0,14,14);
+      }
     },
     renderPos(_x, _y){
       const x = Math.round(_x);
@@ -48,6 +53,14 @@ export default {
   mounted(){
     const w = window.innerWidth;
     const h = window.innerHeight;
+    EventBus.$on('toolToggle', (e) => {
+      if(e == 'Zoom'){
+        this.zoom = true;
+      }else if(e == 'Brush'){
+        this.zoom = false;
+      }
+    });
+
     EventBus.$on('color', (c) => {
       if(c){
         this.color = c.hex;
@@ -72,6 +85,7 @@ export default {
       };
 
       EventBus.$on('pDn', (e)=>{
+        if(!this.zoom){
           this.$refs.tipBG.style.top = "-4px";
           this.$refs.tipBG.style.left = "6px";
           this.$refs.tipBG.style.transform = "scaleX(-1) rotate(90deg)";
@@ -83,9 +97,12 @@ export default {
           this.$refs.tip.style.top = "-4px";
           this.$refs.tip.style.left = "6px";
           this.$refs.tip.style.transform = "scaleX(-1) rotate(90deg)";
+
+        }
       });
 
       EventBus.$on('pUp', (e)=>{
+        if(!this.zoom){
           this.$refs.tipBG.style.top = "0px";
           this.$refs.tipBG.style.left = "0px";
           this.$refs.tipBG.style.transform = "rotate(0deg)";
@@ -97,19 +114,45 @@ export default {
           this.$refs.tip.style.top = "0px";
           this.$refs.tip.style.left = "0px";
           this.$refs.tip.style.transform = "rotate(0deg)";
+        }
+      });
+
+      EventBus.$on('palletUp', (e) => {
+        if(this.sleeveDown){
+          this.$refs.brush.style.top = window.innerHeight - 80 + "px";
+          this.sleeveDown = false;
+        }
+      });
+
+      EventBus.$on('palletDn', (e) => {
+        if(!this.sleeveDown){
+          this.$refs.brush.style.top = window.innerHeight - 20 + "px";
+          this.sleeveDown = true;
+        }
+      });
+
+      EventBus.$on('palletMv', (e) => {
+        this.$refs.brush.style.width = (window.innerWidth - e.clientX) + "px";
+
+        this.$refs.brush.style.top = window.innerHeight - 80 + "px";
+        this.$refs.brush.style.left = e.clientX + "px";
       });
 
       EventBus.$on('pMv', (e)=>{
         let top = e.offsetY;
 
-        if(e.offsetY > window.innerHeight - window.innerHeight/9 && !this.palletShow){
-          this.palletShow = true;
-          top = e.offsetY - 45;
-          this.$refs.brush.style.transform = "scaleY(-1)"
-        } else if(e.offsetY < window.innerHeight - window.innerHeight/9){
-          top = e.offsetY
-          this.$refs.brush.style.transform = "scaleY(1)"
-          this.palletShow = false;
+        if(!this.zoom){
+          if(e.offsetY > window.innerHeight - window.innerHeight/5 && !this.palletShow){
+            this.palletShow = true;
+            top = e.offsetY - 45;
+            this.$refs.brush.style.transform = "scaleY(-1)"
+            EventBus.$emit('palletShow', true);
+          } else if(e.offsetY < window.innerHeight - window.innerHeight/9){
+            top = e.offsetY
+            this.$refs.brush.style.transform = "scaleY(1)"
+            this.palletShow = false;
+            EventBus.$emit('palletShow', false);
+          }
         }
 
         this.renderPos(e.offsetX, top);
