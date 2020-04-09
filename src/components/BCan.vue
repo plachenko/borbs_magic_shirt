@@ -17,10 +17,6 @@ import EventBus from '../Eventbus';
 export default {
   name: 'BCan',
   props: {
-    zoom:{
-      type: Boolean,
-      default: false
-    },
     frameMax:{
       type: Number,
       default: 0
@@ -29,7 +25,6 @@ export default {
   data: function(){
     return{
       zoom: false,
-      zoomed: false,
       palletShow: false,
       md: false,
       color: "000000",
@@ -46,13 +41,10 @@ export default {
     curPos(pnt){
       this.clear(1);
       if(pnt && !this.zoom){
-<<<<<<< HEAD
-=======
         if(this.palletShow){
           EventBus.$emit('palletShow', false);
         }
 
->>>>>>> refactor
         if(!this.pntDn){
           this.fpnt = Object.assign({}, pnt);
           this.pntDn = true;
@@ -77,6 +69,7 @@ export default {
     }
   },
   methods:{
+    /*
     zoomChange(){
       let zoom;
       if(this.zoomed){
@@ -98,6 +91,7 @@ export default {
       })
       this.drawStrokes();
     },
+    */
     frameChange(_frameN){
       this.frameN = _frameN;
       this.clear(0);
