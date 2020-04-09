@@ -1,6 +1,10 @@
 <template>
   <div id="app">
+    <!--
+      =Borb's Magic Shirt=
+      An HTML Canvas applcation that uses context2D to paint in time.
 
+<<<<<<< HEAD
     <div ref="cap" id="cap" />
     <div ref="brush" id="brush">
       <canvas v-if="!zoom" :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9994;"/>
@@ -10,11 +14,31 @@
       <img src="./assets/brush.png" style="left: 20px; position: absolute;" />
       <div id="sleeve" />
     </div>
+=======
+      Check out TomThinks on twitch to catch a borb painting stream!
+      https://www.twitch.tv/tomthinks
+    -->
 
+    <!-- Modal that appears for extras -->
+    <BModal :modalOpts="modalOpts" v-if="modalOpts" @exit="modalExit" />
+
+    <input type="file" ref="file" @change="load" style="display:none" />
+
+    <!-- The Event Capture -->
+    <BEvent />
+>>>>>>> refactor
+
+    <!-- Borb's shirt sleeve. -->
+    <BSleeve />
+
+
+    <!-- Middle Container -->
     <div id="container">
       <div id="middle">
+        <!-- Reference Image that loads -->
         <div id="refImg" ref="refImg"></div>
 
+<<<<<<< HEAD
         <div id="menu">
           <a href="#" @click="save">Save</a>
           <a href="#" :class="{zoom: zoom}" @click="toggleZoom">Zoom</a>
@@ -39,15 +63,20 @@
               <div :style="{backgroundColor: color ? '#'+color.hex : '#FFF'}" />
             </div>
           </div>
+=======
+        <!-- Menu items. -->
+        <BMenu ref="menu" @modalShow="modalShow($event)" @modalExit="modalExit" />
+        <BTimeline ref="timeline" v-show="timelineShow" />
 
-          <div @click="toggleLine" style="z-index: 9998; position: absolute; top: -5px; right: -100px;">
-            Stroke
-            <div :class="{cur: selected == 'line'}" class="colPrev">
-              <span v-show="!lineColor" class="X">X</span>
-              <div :style="{backgroundColor: lineColor ? '#'+lineColor.hex : '#FFF'}" />
-            </div>
-          </div>
+        <!-- Paint Canvas -->
+        <BCan ref="paintCan" />
+        <!-- <BCan :frameMax="fMax" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" /> -->
+>>>>>>> refactor
 
+        <!-- Paint Pallet -->
+        <BPallet />
+
+<<<<<<< HEAD
           <div v-if="!zoom" ref="pallet" style="display: flex; width: 100%; position: absolute; height: 100%;">
             <div
               class="palletCol"
@@ -59,33 +88,67 @@
           <!-- <canvas ref="palletCan" width="315" height="35" /> -->
           <img src="./assets/pallet.png" ref="palletImg">
         </div>
+=======
+>>>>>>> refactor
       </div>
     </div>
-    <canvas ref="render" width="420" height="420" style="display: none;" />
+
+    <canvas ref="render" style="display: none;" />
 
   </div>
 </template>
 
 <script>
-import BCan from './components/BCan';
-import BTimeline from './components/BTimeline';
 import gsap from 'gsap';
-import Color from './classes/Color';
 
 // eslint-disable-next-line
 import GIF from './assets/js/gif.js';
 import * as WorkerGIF from '!!raw-loader!./assets/js/gif.worker';
+
 import EventBus from './Eventbus';
+import BSleeve from './components/BSleeve';
+import BEvent from './components/BEvent';
+import BMenu from './components/BMenu';
+import BCan from './components/BCan';
+import BPallet from './components/BPallet';
+import BModal from './components/BModal';
+import BTimeline from './components/BTimeline';
 
 export default {
   name: 'App',
   components: {
     BCan,
+    BMenu,
+    BPallet,
+    BEvent,
+    BSleeve,
+    BModal,
     BTimeline
-    // BColor
+  },
+  mounted(){
+    EventBus.$on('timelineToggle', () =>{
+      this.timelineShow = !this.timelineShow;
+    });
+    EventBus.$on('clearCan', this.modalExit );
+    EventBus.$on('saveGIF', this.saveGIF );
+    EventBus.$on('savePNG', this.savePNG );
+    EventBus.$on('loadRef', this.loadRef );
+    EventBus.$on('ghLink', () => {
+      window.open('https://www.github.com/plachenko/borbs_magic_shirt');
+    })
+    EventBus.$on('fsToggle', () =>{
+      if(this.fs){
+        this.fs = false;
+        document.exitFullscreen();
+      }else{
+        this.fs = true
+        document.getElementById('app').requestFullscreen();
+      }
+    });
   },
   data: function(){
     return{
+<<<<<<< HEAD
       zoom: false,
       coloring: false,
       color: new Color('000000'),
@@ -149,38 +212,49 @@ export default {
           this.lineColor = new Color(val.hex);
         }
       }
+=======
+      fs: false,
+      timelineShow: false,
+      modalOpts: null
+    }
+  },
+  methods:{
+    loadRef(){
+      this.$refs.file.click();
+>>>>>>> refactor
     },
-    toggleColor(){
-      if(this.selected == 'bg'){
-        if(this.color){
-          this.color = null;
-        }else{
-          this.color = new Color("000000");
-        }
-      }
-      this.selected = 'bg';
+    modalShow(opts){
+      this.modalOpts = opts;
     },
-    toggleLine(){
-      if(this.selected == 'line'){
-        if(this.lineColor){
-          this.lineColor = null;
-        }else{
-          this.lineColor = new Color("000000");
-        }
-      }
-      this.selected = 'line';
+    modalExit(){
+      this.$refs.menu.current = '';
+      this.modalOpts = null;
     },
-    save(){
+    savePNG(){
+      const canRef = this.$refs.paintCan;
+      const canLyr = canRef.$refs.can[0];
+      const renderCan = this.$refs.render;
+
+      const img = canLyr.getContext('2d').getImageData(10,10,canLyr.width,canLyr.height-10);
+      renderCan.width = canLyr.width - 20;
+      renderCan.height = canLyr.height - 30;
+      renderCan.getContext('2d').fillStyle = "#FFF";
+      renderCan.getContext('2d').fillRect(0, 0, 420, 420);
+      renderCan.getContext('2d').putImageData(img, 0, 0);
+
+      const url = renderCan.toDataURL('image/png');
+      let fURL;
+      fetch(url)
+      .then(res => res.blob())
+      .then( blob => {
+        fURL = URL.createObjectURL(blob);
+        window.open(fURL)
+      });
+    },
+    saveGIF(){
       const workerStr = WorkerGIF.default;
       const blob = new Blob([workerStr], {
           type: 'application/javascript'
-      });
-      const gif = new GIF({
-          workers: 4,
-          width: 370,
-          height: 360,
-          workerScript: URL.createObjectURL(blob),
-          quality: 3
       });
 
       const tLine = this.$refs.timeline;
@@ -189,13 +263,24 @@ export default {
       const canLyr = canRef.$refs.can[0];
       let img;
 
+      renderCan.width = canLyr.width - 10;
+      renderCan.height = canLyr.height - 10;
+
+      const gif = new GIF({
+          workers: 4,
+          width: renderCan.width,
+          height: renderCan.height,
+          workerScript: URL.createObjectURL(blob),
+          quality: 3
+      });
+
       for(let i = 0; i <= tLine.frameMax; i++){
         canRef.frameChange(i);
-        img = canLyr.getContext('2d').getImageData(30,55,420,420);
+        img = canLyr.getContext('2d').getImageData(30,15,canLyr.width,canLyr.height-10);
         renderCan.getContext('2d').fillStyle = "#FFF";
         renderCan.getContext('2d').fillRect(0, 0, 420, 420);
         renderCan.getContext('2d').putImageData(img, 0, 0);
-        gif.addFrame(renderCan, {copy: true, delay: tLine.speed*1.5});
+        gif.addFrame(canLyr, {copy: true, delay: tLine.speed*1.5});
       }
 
       gif.render();
@@ -203,24 +288,13 @@ export default {
       gif.on('finished', function(_gifblob){
         window.open(URL.createObjectURL(_gifblob));
       })
-
-    },
-    camera(){
-      if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-        .then(function (stream) {
-          // video.srcObject = stream;
-        })
-        .catch(function (err) {
-          //
-        });
-      }
     },
     load(e){
       const target = e.target.files;
       const url = URL.createObjectURL(target[0])
       let delay = 0;
 
+      this.modalExit();
       if(this.refOpen){
         delay = 1.5
         gsap.to('#refImg', 1, {top: -230});
@@ -232,22 +306,8 @@ export default {
 
       gsap.to('#refImg', 1, {top: 10, delay: delay});
       this.refOpen = true;
-    },
-    tipChange(){
-      const ctxt = this.$refs.linetip.getContext('2d');
-      ctxt.drawImage(this.tipImg, 0, 0);
-      ctxt.fillStyle = this.lineColor ? "#"+this.lineColor.hex : "";
-
-      ctxt.globalCompositeOperation = "source-in";
-      ctxt.fillRect(0,0,14,14);
-
-      const ctx = this.$refs.tip.getContext('2d');
-      ctx.drawImage(this.tipImg, 0, 0);
-      ctx.fillStyle = this.color ? "#"+this.color.hex : "";
-
-      ctx.globalCompositeOperation = "source-in";
-      ctx.fillRect(0,0,14,14);
     }
+<<<<<<< HEAD
   },
   mounted(){
     let paintPos, palletPos;
@@ -347,6 +407,8 @@ export default {
       this.$refs.brush.style.top = top + 'px';
       this.$refs.brush.style.left = e.offsetX - 15 + 'px';
     });
+=======
+>>>>>>> refactor
   }
 }
 </script>
@@ -354,6 +416,7 @@ export default {
 <style>
 *{
   user-select: none;
+  overscroll-behavior: none;
 }
 html, body{
   margin: 0px;
@@ -368,45 +431,41 @@ html, body{
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+  background-color:#FFF;
   position: relative;
   display: flex;
   flex-flow: column;
   justify-content: center;
   }
-  #cap{
-    position: absolute;
-    left:0px;
-    top: 0px;
-    width: 100%;
-    height: 100%;
-    z-index: 9998;
-    cursor: none;
-    }
-  #brush{
-    position: absolute;
-    z-index: 9997;
-    background-repeat: repeat-x;
-    color:#000;
-    position: absolute;
-    }
   #container{
     flex: 1;
     display: flex;
     flex-flow: column;
     align-items: center;
     }
+    #middle{
+      position: relative;
+      width: 440px;
+      height: 100%;
+      flex: 1;
+      display: flex;
+      flex-flow: column;
+      align-items: center;
+      }
   #refImg{
     background-repeat: no-repeat;
     background-size: cover;
     width: 160px;
     height: 200px;
     position: absolute;
-    right: -120px;
+    right: -150px;
     z-index: 9997;
+    background-color:#FFF;
     box-sizing: border-box;
     top: -230px;
     border: 2px solid;
     }
+<<<<<<< HEAD
     #middle{
       position: relative;
       width: 500px;
@@ -515,4 +574,6 @@ html, body{
         .zoom{
           background-color:#444;
         }
+=======
+>>>>>>> refactor
 </style>

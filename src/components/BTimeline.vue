@@ -1,13 +1,11 @@
 <template>
-  <div class="container">
-    <span id="playBtn" v-if="!rec" @click="togglePlay">{{playing ? 'stop' : 'play'}}</span>
-    <span id="recBtn" v-if="!playing" :class="{recording: rec}" @click="toggleRec">Rec</span>
-    <span style="display: inline-block; margin-right: 10px;">Max:</span>
-    <input type="number" style="width: 30px; margin-right: 10px;" min="0" v-model="frameMax" />
-    <span style="display: inline-block; margin-right: 10px;">frame: {{frameNum}}</span>
+  <div id="timelineContainer">
+    <span style="display: inline-block; margin-right: 5px;">Max:</span>
+    <input type="number" style="width: 30px; margin-right: 5px;" min="0" v-model="frameMax" />
+    <span style="display: inline-block; margin-right: 5px;">frame: {{frameNum}}</span>
     <input style="width: 40px;" type="range" v-model="frameNum" :max="frameMax">
-    <span style="display: inline-block; margin:0px 10px;">speed: {{speed / 1000}}s</span>
-    <input style="width: 40px;" type="range" v-model="speed" max="100" min="10" step="10">
+    <span style="display: inline-block; margin:0px 5px;">speed: </span>
+    <input type="number" style="width: 40px; margin-right: 5px;" min="1" max="100" v-model="speed" />
   </div>
 </template>
 <script>
@@ -28,7 +26,7 @@ export default {
       frameNum: 0,
       frameMax: 3,
       rec: false,
-      playing: false
+      playing: true
     }
   },
   watch:{
@@ -84,6 +82,9 @@ export default {
     }
   },
   mounted(){
+    EventBus.$on('playToggle', (v) => {
+      this.togglePlay();
+    })
     document.addEventListener('keydown', (e)=>{
       if(e.which == 32){
         this.togglePlay();
@@ -97,12 +98,13 @@ export default {
 }
 </script>
 <style scoped>
-.container{
+#timelineContainer{
+  text-align: center;
   box-sizing: border-box;
   position: absolute;
-  bottom: -70px;
-  width: 140%;
-  left:-20%;
+  width: 75%;
+  top: 50px;
+  z-index: 9999;
   border: 2px solid;
   padding: 10px;
   background-color:#FFF;
