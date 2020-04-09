@@ -63,9 +63,6 @@ export default {
         this.fpnt = null;
         this.drawStrokes();
       }
-      if(this.zoom){
-        console.log(pnt)
-      }
     }
   },
   methods:{

@@ -119,9 +119,6 @@ export default {
         EventBus.$emit('toolToggle', 'Brush');
       }
     },
-    testM(){
-      console.log('hi');
-    }
   }
 }
 </script>
