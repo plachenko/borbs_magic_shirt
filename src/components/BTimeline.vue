@@ -26,7 +26,7 @@ export default {
       frameNum: 0,
       frameMax: 3,
       rec: false,
-      playing: false
+      playing: true
     }
   },
   watch:{
