@@ -103,7 +103,6 @@ export default {
   methods:{
     loadRef(){
       this.$refs.file.click();
-      console.log('load click.');
     },
     modalShow(opts){
       this.modalOpts = opts;
@@ -116,7 +115,15 @@ export default {
       const canRef = this.$refs.paintCan;
       const canLyr = canRef.$refs.can[0];
       const renderCan = this.$refs.render;
-      const url = canLyr.toDataURL('image/png');
+
+      const img = canLyr.getContext('2d').getImageData(10,10,canLyr.width,canLyr.height-10);
+      renderCan.width = canLyr.width - 20;
+      renderCan.height = canLyr.height - 30;
+      renderCan.getContext('2d').fillStyle = "#FFF";
+      renderCan.getContext('2d').fillRect(0, 0, 420, 420);
+      renderCan.getContext('2d').putImageData(img, 0, 0);
+
+      const url = renderCan.toDataURL('image/png');
       let fURL;
       fetch(url)
       .then(res => res.blob())
@@ -137,20 +144,20 @@ export default {
       const canLyr = canRef.$refs.can[0];
       let img;
 
-      renderCan.width = canLyr.width - 20;
-      renderCan.height = canLyr.height - 20;
+      renderCan.width = canLyr.width - 10;
+      renderCan.height = canLyr.height - 10;
 
       const gif = new GIF({
           workers: 4,
-          width: canLyr.width,
-          height: canLyr.height,
+          width: renderCan.width,
+          height: renderCan.height,
           workerScript: URL.createObjectURL(blob),
           quality: 3
       });
 
       for(let i = 0; i <= tLine.frameMax; i++){
         canRef.frameChange(i);
-        img = canLyr.getContext('2d').getImageData(50,55,420,420);
+        img = canLyr.getContext('2d').getImageData(30,15,canLyr.width,canLyr.height-10);
         renderCan.getContext('2d').fillStyle = "#FFF";
         renderCan.getContext('2d').fillRect(0, 0, 420, 420);
         renderCan.getContext('2d').putImageData(img, 0, 0);

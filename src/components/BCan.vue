@@ -100,7 +100,7 @@ export default {
     },
     drawBG(){
       const underCan = this.$refs.can[0].getContext('2d');
-      underCan.fillStyle = "#F0F";
+      underCan.fillStyle = "#FFF";
       underCan.fillRect(0,0,this.$refs.can[0].width, this.$refs.can[0].height);
     },
     drawStrokes(){
@@ -180,13 +180,8 @@ export default {
         _wh = 415;
       }
 
-      // document.getElementById('canvasImg').style.height = _h +"px";
       const canImg = document.getElementById('canvasImg');
 
-      // const dim = document.getElementById('canvasImg').getClientRects();
-      // console.log(dim);
-      // const dimh = dim[0].height - Math.round(h/10);
-      // const dimw = dim[0].width - Math.round(dim[0].width/(h/107));
       if(w <= 360){
         this.$refs.canContainer.style.marginTop = (h/2) - 250  + "px";
         canImg.style.width = "80%";
@@ -198,34 +193,15 @@ export default {
       }
 
       this.$refs.can.forEach((el)=>{
-        // el.style.top = Math.round(dim[0].height/(w/62))+"px";
         if(w <= 360){
           el.style.top = "40px";
-          el.width = 308;
+          el.width = 315;
           el.height = 300;
         }else{
           el.style.top = "52px";
-          el.width = 392;
+          el.width = 396;
           el.height = 380;
         }
-        // el.style.left = w/2 - dim[0].width/2 + "px";
-        // el.style.left = "40px";
-        // el.height = _wh - 140;
-
-        /*
-        if(dimh < 400){
-          el.height = dimh;
-        }
-
-        if(dimw < 400){
-          el.width = dimw;
-        }else{
-
-        }
-        */
-
-        // el.width = 380;
-        // el.height = 380;
       });
 
       this.drawStrokes();
@@ -277,12 +253,20 @@ export default {
         this.drawStrokes();
       }
     });
+    const w = window.innerWidth;
 
     EventBus.$on('pMv', (e) => {
       const cont = document.getElementById('canvasContainer');
       const paintPos = cont.getBoundingClientRect();
-      const x = Math.round(e.offsetX - paintPos.x);
-      const y = Math.round(e.offsetY - paintPos.y);
+      let x, y;
+
+      if(w <= 360){
+        x = Math.round(e.offsetX - paintPos.x) - 65;
+        y = Math.round(e.offsetY - paintPos.y) - 40;
+      }else{
+        x = Math.round(e.offsetX - paintPos.x) - 25;
+        y = Math.round(e.offsetY - paintPos.y) - 55;
+      }
 
       if(this.md){
         this.curPos = {x: x, y: y};
