@@ -27,7 +27,7 @@ export default {
       menuItems: [
         { name: 'Save', method:  this.save },
         { name: 'Play', method: this.playToggle },
-        { name: 'Zoom', method: this.toolToggle },
+        // { name: 'Zoom', method: this.toolToggle },
         { name: 'Timeline', method: this.timelineToggle },
         { name: 'More', method: this.more }
       ]
@@ -59,11 +59,17 @@ export default {
         const obj = {
           title: "More",
           items: [
-            {name: 'Load', method: 'loadRef'},
             {name: 'Clear', method: 'clearCan'},
+            {name: 'Fullscreen', method: 'fsToggle'},
+            {name: 'View Source / Report Bug', method: 'ghLink'},
             // {name: 'Pallet', method: 'stuff'},
           ]
         };
+
+        //temporary Hack to stop from confusion of loading image on smaller devices
+        if(window.innerWidth > 450){
+          obj.items.unshift({name: 'Load', method: 'loadRef'});
+        }
         this.$emit('modalShow', obj);
       }
     },

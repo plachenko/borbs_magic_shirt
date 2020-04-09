@@ -1,13 +1,15 @@
 <template>
   <div id="canvasContainer" ref="canContainer">
-    <canvas
-      v-for="(can, idx) in 2"
-      :key="idx"
-      width="420"
-      height="420"
-      ref="can"
-      />
-    <div id="canvasImg" />
+    <div style="width: 80%; display: flex; place-content: center;">
+      <div id="canvasImg" />
+
+      <canvas
+        v-for="(can, idx) in 2"
+        :key="idx"
+        ref="can"
+        />
+
+    </div>
   </div>
 </template>
 <script>
@@ -98,7 +100,7 @@ export default {
     },
     drawBG(){
       const underCan = this.$refs.can[0].getContext('2d');
-      underCan.fillStyle = "#FFF";
+      underCan.fillStyle = "#F0F";
       underCan.fillRect(0,0,this.$refs.can[0].width, this.$refs.can[0].height);
     },
     drawStrokes(){
@@ -169,6 +171,8 @@ export default {
     renderCan(){
       const w = window.innerWidth;
       const h = window.innerHeight;
+      this.w = w;
+      this.h = h;
       const _h = Math.round(h/1.6);
       let _wh = _h;
 
@@ -176,11 +180,54 @@ export default {
         _wh = 415;
       }
 
-      document.getElementById('canvasImg').style.height = _h +"px";
+      // document.getElementById('canvasImg').style.height = _h +"px";
+      const canImg = document.getElementById('canvasImg');
+
+      // const dim = document.getElementById('canvasImg').getClientRects();
+      // console.log(dim);
+      // const dimh = dim[0].height - Math.round(h/10);
+      // const dimw = dim[0].width - Math.round(dim[0].width/(h/107));
+      if(w <= 360){
+        this.$refs.canContainer.style.marginTop = (h/2) - 250  + "px";
+        canImg.style.width = "80%";
+        canImg.style.height = "450px";
+      }else{
+        this.$refs.canContainer.style.marginTop = (h/2) - 280  + "px";
+        canImg.style.width = "100%";
+        canImg.style.height = "450px";
+      }
+
       this.$refs.can.forEach((el)=>{
-        el.height = _wh;
-      })
-      this.$refs.canContainer.style.marginTop = (window.innerHeight/2) - 250  + "px";
+        // el.style.top = Math.round(dim[0].height/(w/62))+"px";
+        if(w <= 360){
+          el.style.top = "40px";
+          el.width = 308;
+          el.height = 300;
+        }else{
+          el.style.top = "52px";
+          el.width = 392;
+          el.height = 380;
+        }
+        // el.style.left = w/2 - dim[0].width/2 + "px";
+        // el.style.left = "40px";
+        // el.height = _wh - 140;
+
+        /*
+        if(dimh < 400){
+          el.height = dimh;
+        }
+
+        if(dimw < 400){
+          el.width = dimw;
+        }else{
+
+        }
+        */
+
+        // el.width = 380;
+        // el.height = 380;
+      });
+
       this.drawStrokes();
     }
   },
@@ -259,8 +306,8 @@ export default {
 <style scoped>
 canvas{
   position: absolute;
-  top: 0px;
-  left: 0px;
+  /* top: 40px; */
+  /* left: 45px; */
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   }
@@ -274,6 +321,8 @@ canvas{
     background-position: center;
     background-image: url('../assets/canvasBot.png');
     align-self: center;
+    display: flex;
+    place-content: center;
     }
   #canvasImg{
     position: absolute;
@@ -282,8 +331,7 @@ canvas{
     background-position: center top;
     background-repeat: no-repeat;
     background-size: contain;
-    width: 100%;
-    min-height: 60%;
-    max-height: 100%;
+    /* min-height: 60%; */
+    /* max-height: 100%; */
     }
 </style>

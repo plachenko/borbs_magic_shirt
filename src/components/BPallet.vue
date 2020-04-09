@@ -1,10 +1,12 @@
 <template>
   <div id="palletContainer" v-if="!zoom">
+    <!--
     <div style="position: relative; place-content: center; display:flex; height: 30px;">
       <div id="palletToggle" @click="showPallet" />
     </div>
+    -->
 
-    <div class="preview" @click="toggleColor" style="z-index: 9991; position: absolute; top: -55px; left: 30px;">
+    <div class="preview" @click="toggleColor" id="fillPrev">
       Fill
       <div :class="{cur: selected == 'bg'}" class="colPrev">
         <span v-show="!color" class="X">X</span>
@@ -12,7 +14,7 @@
       </div>
     </div>
 
-    <div class="preview" @click="toggleLine" style="z-index: 9991; position: absolute; top: -55px; right: 30px;">
+    <div class="preview" @click="toggleLine" id="linePrev">
       Stroke
       <div :class="{cur: selected == 'line'}" class="colPrev">
         <span v-show="!lineColor" class="X">X</span>
@@ -161,6 +163,11 @@ export default {
 
       if(w > 500){
         w = 500;
+      }else{
+        document.getElementById('linePrev').style.top = "-100px";
+        document.getElementById('fillPrev').style.top = "-100px";
+        document.getElementById('linePrev').style.right = "30px";
+        document.getElementById('fillPrev').style.left = "30px";
       }
 
       document.getElementById('palletImg').style.width = w + "px";
@@ -172,7 +179,8 @@ export default {
 <style>
 #palletContainer{
   position: absolute;
-  bottom: -50px;
+  /* bottom: -50px; */
+  bottom: 0px;
 }
 
 .palletCol{
@@ -223,7 +231,18 @@ export default {
     cursor: pointer;
   }
   .preview{
-    opacity: 0;
+    /* opacity: 0; */
   }
-
+  #fillPrev{
+    z-index: 9991;
+    position: absolute;
+    top: -35px;
+    left: -70px;
+  }
+  #linePrev{
+    z-index: 9991;
+    position: absolute;
+    top: -35px;
+    right: -70px;
+  }
 </style>

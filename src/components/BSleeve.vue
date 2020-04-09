@@ -134,14 +134,26 @@ export default {
       EventBus.$on('palletMv', (e) => {
         this.$refs.brush.style.width = (window.innerWidth - e.clientX) + "px";
 
+        // top = e.offsetY - 45;
+        if(!this.palletShow){
+          this.$refs.brush.style.transform = "scaleY(-1)"
+          this.palletShow = true;
+        }
+
         this.$refs.brush.style.top = window.innerHeight - 80 + "px";
         this.$refs.brush.style.left = e.clientX + "px";
       });
 
       EventBus.$on('pMv', (e)=>{
-        let top = e.offsetY;
+        const top = e.offsetY;
+
+        if(this.palletShow){
+          this.$refs.brush.style.transform = "scaleY(1)"
+          this.palletShow = false;
+        }
 
         if(!this.zoom){
+          /*
           if(e.offsetY > window.innerHeight - window.innerHeight/5 && !this.palletShow){
             this.palletShow = true;
             top = e.offsetY - 45;
@@ -153,6 +165,7 @@ export default {
             this.palletShow = false;
             EventBus.$emit('palletShow', false);
           }
+          */
         }
 
         this.renderPos(e.offsetX, top);

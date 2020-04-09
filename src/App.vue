@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <canvas ref="render" width="420" height="420" style="display: none;" />
+    <canvas ref="render" style="display: none;" />
 
   </div>
 </template>
@@ -80,9 +80,22 @@ export default {
     EventBus.$on('saveGIF', this.saveGIF );
     EventBus.$on('savePNG', this.savePNG );
     EventBus.$on('loadRef', this.loadRef );
+    EventBus.$on('ghLink', () => {
+      window.open('https://www.github.com/plachenko/borbs_magic_shirt');
+    })
+    EventBus.$on('fsToggle', () =>{
+      if(this.fs){
+        this.fs = false;
+        document.exitFullscreen();
+      }else{
+        this.fs = true
+        document.getElementById('app').requestFullscreen();
+      }
+    });
   },
   data: function(){
     return{
+      fs: false,
       timelineShow: false,
       modalOpts: null
     }
@@ -103,20 +116,19 @@ export default {
       const canRef = this.$refs.paintCan;
       const canLyr = canRef.$refs.can[0];
       const renderCan = this.$refs.render;
-      const url = canLyr.toDataURL("image/png").replace(/^data:image\/[^;]/, 'data:application/octet-stream');
-      window.open(url, '_blank')
+      const url = canLyr.toDataURL('image/png');
+      let fURL;
+      fetch(url)
+      .then(res => res.blob())
+      .then( blob => {
+        fURL = URL.createObjectURL(blob);
+        window.open(fURL)
+      });
     },
     saveGIF(){
       const workerStr = WorkerGIF.default;
       const blob = new Blob([workerStr], {
           type: 'application/javascript'
-      });
-      const gif = new GIF({
-          workers: 4,
-          width: 370,
-          height: 360,
-          workerScript: URL.createObjectURL(blob),
-          quality: 3
       });
 
       const tLine = this.$refs.timeline;
@@ -125,13 +137,24 @@ export default {
       const canLyr = canRef.$refs.can[0];
       let img;
 
+      renderCan.width = canLyr.width - 20;
+      renderCan.height = canLyr.height - 20;
+
+      const gif = new GIF({
+          workers: 4,
+          width: canLyr.width,
+          height: canLyr.height,
+          workerScript: URL.createObjectURL(blob),
+          quality: 3
+      });
+
       for(let i = 0; i <= tLine.frameMax; i++){
         canRef.frameChange(i);
-        img = canLyr.getContext('2d').getImageData(30,55,420,420);
+        img = canLyr.getContext('2d').getImageData(50,55,420,420);
         renderCan.getContext('2d').fillStyle = "#FFF";
         renderCan.getContext('2d').fillRect(0, 0, 420, 420);
         renderCan.getContext('2d').putImageData(img, 0, 0);
-        gif.addFrame(renderCan, {copy: true, delay: tLine.speed*1.5});
+        gif.addFrame(canLyr, {copy: true, delay: tLine.speed*1.5});
       }
 
       gif.render();
@@ -180,6 +203,7 @@ html, body{
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+  background-color:#FFF;
   position: relative;
   display: flex;
   flex-flow: column;
