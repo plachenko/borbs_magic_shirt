@@ -59,38 +59,42 @@ export default {
       palletShow: true,
       lineColor: null,
       colors:[
-        new Color('000000'),
-        new Color('FFFFFF'),
-        new Color('F2B7D6'),
-        new Color('E91D3B'),
-        new Color('FDBC24'),
-        new Color('45B5F1'),
-        new Color('A776EE'),
-        new Color('58E8A4'),
-        new Color('162770'),
-        new Color('5A2F1C'),
-        new Color('F7EB3D'),
-        new Color('C7C6C7'),
-        new Color('115011'),
-        new Color('380E74')
+        new Color('0000FF', '000000'),
+        new Color('FFFFFF', '0000FF'),
+        new Color('F2B7D6', '0000FF'),
+        new Color('E91D3B', '0000FF'),
+        new Color('FDBC24', '0000FF'),
+        new Color('45B5F1', '0000FF'),
+        new Color('A776EE', '0000FF'),
+        new Color('58E8A4', '0000FF'),
+        new Color('162770', '0000FF'),
+        new Color('5A2F1C', '0000FF'),
+        new Color('F7EB3D', '0000FF'),
+        new Color('C7C6C7', '0000FF'),
+        new Color('115011', '0000FF'),
+        new Color('380E74', '0000FF')
       ]
     }
   },
   methods:{
     changeColor(val){
+
+      val.idx = 1 - val.idx;
+
       if(this.selected == 'bg'){
         if(this.color){
-          this.color.mix(val);
+          this.color = new Color(this.color.mix(val, this.firstColor));
         }else{
           this.color = new Color(val.hex);
         }
         EventBus.$emit('color', this.color);
       } else if(this.selected == 'line'){
         if(this.lineColor){
-          this.lineColor.mix(val);
+          this.lineColor = new Color(this.color.mix(val, this.firstColor));
         }else{
           this.lineColor = new Color(val.hex);
         }
+
         EventBus.$emit('lineColor', this.lineColor);
       }
     },

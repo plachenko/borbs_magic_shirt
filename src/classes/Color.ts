@@ -2,8 +2,11 @@ export default class Color{
   public red = 0;
   public green = 0;
   public blue = 0;
+  public idx = 1;
+  public colors: any[];
 
-  constructor(hex: string){
+  constructor(hex: string, hex2: string | null = null){
+    this.colors = [hex, hex2];
     if(hex){
       this.hexToRgb(hex);
     }
@@ -13,7 +16,16 @@ export default class Color{
     return this.componentToHex(this.red) + this.componentToHex(this.green) + this.componentToHex(this.blue);
   }
 
+  public swap(){
+    if(this.colors[this.idx]){
+      return this.colors[this.idx];
+      // this.hexToRgb(this.colors[this.idx]);
+    }
+  }
+
   public mix(color: Color){
+    return color.swap()
+    /*
     const mixAmt = 3;
     const rdiff = Math.floor((color.red - this.red) / mixAmt);
     const bdiff = Math.floor((color.blue - this.blue) / mixAmt);
@@ -27,6 +39,7 @@ export default class Color{
 
     if(this.green >= 0 && this.green <= 255)
       this.green += gdiff;
+    */
   }
 
   public hexToRgb(_hex: string){
