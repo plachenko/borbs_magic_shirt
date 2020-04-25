@@ -138,6 +138,8 @@ export default {
     },
     draw(idx, path, col, lCol){
       const ctx = this.$refs.can[idx].getContext('2d');
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
       if(idx == 1){
         // this.clear(1);
       }
