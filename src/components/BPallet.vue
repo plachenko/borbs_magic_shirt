@@ -73,13 +73,19 @@ export default {
         new Color('C6C6C6', 'ECEAEA'),
         new Color('105110', '0DA60D'),
         new Color('360E72', '7329E2')
-      ]
+      ],
+      colorIdx: null
     }
   },
   methods:{
     changeColor(val){
 
-      val.idx = 1 - val.idx;
+      if(this.colorIdx != this.colors.indexOf(val)){
+        val.idx = 0;
+        this.colorIdx = this.colors.indexOf(val);
+      }else{
+        val.idx = 1 - val.idx;
+      }
 
       if(this.selected == 'bg'){
         if(this.color){
