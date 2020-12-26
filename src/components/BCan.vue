@@ -1,7 +1,11 @@
 <template>
   <div id="canvasContainer" ref="canContainer">
+    <div style="position: absolute; top: -20px;left: -100px">{{zoomOffset}}</div>
+    <div style="position: absolute; top: -20px;">X: {{Math.round(mPos.x/zoomSize)}} Y: {{Math.round(mPos.y/zoomSize)}}</div>
     <div style="width: 80%; display: flex; place-content: center;">
       <div id="canvasImg" />
+
+      <canvas ref="debugCan"></canvas>
 
       <canvas
         v-for="(can, idx) in 2"
@@ -35,11 +39,16 @@ export default {
       points: [],
       strokes: [],
       frameN: 0,
+      zoomSize: 1,
+      zoomOffset: {x: 0, y: 0},
+      pos: {x: 0, y:0},
+      mPos: {x: 0, y:0}
     }
   },
   watch:{
     curPos(pnt){
       this.clear(1);
+
       if(pnt && !this.zoom){
         if(this.palletShow){
           EventBus.$emit('palletShow', false);
@@ -54,9 +63,50 @@ export default {
           this.points[this.frameN] = [this.fpnt, pnt];
         }
 
+        // pnt.x = Math.round(pnt.x / this.zoomSize)
+        // pnt.y = Math.round(pnt.y / this.zoomSize)
+        this.pos = pnt
+
         this.points[this.frameN].push(pnt);
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
       }else{
+        const ptArr = []
+        this.points.forEach((frame, idx)=>{
+          // console.log('----')
+          frame.forEach((pnt,pIdx) => {
+            // console.log('x:', pnt.x,'f y', pnt.y)
+            // console.log('pre', pnt.x, pnt.y)
+            // pnt.x += frame[0].x + (pnt.x/this.zoomSize)
+            // pnt.y += frame[1].y + (pnt.y/this.zoomSize)
+            // pnt.x = pnt.x / this.zoomSize
+            // pnt.y = pnt.y / this.zoomSize
+            // pnt.x = (pnt.x / 3) + (firstStroke/3)
+            // this.pos.x = Math.round(window.innerWidth/2 - (e.offsetX + 200)) * -1
+            // this.pos.y = Math.round(window.innerHeight/2 - (e.offsetY + 200)) * -1
+
+            pnt.x = pnt.x / this.zoomSize + (((this.zoomOffset.x) / 3)) * -1
+            pnt.y = pnt.y / this.zoomSize + (((this.zoomOffset.y) / 3)) * -1
+            /*
+            if(this.zoomSize > 1){
+              pnt.x = (firstStroke?.x/this.zoomSize) + (pnt.x / this.zoomSize)
+              pnt.y = (firstStroke?.y/this.zoomSize) + (pnt.y / this.zoomSize)
+            }
+           if(this.zoomSize > 1){
+             if(pIdx < 9){
+             }else{
+                pnt.x = pnt.x / this.zoomSize + ((this.zoomOffset.x + frame[0].x) / 3) * -1
+                pnt.y = pnt.y / this.zoomSize + ((this.zoomOffset.y + frame[0].y) / 3) * -1
+             }
+           }
+            */
+
+            // console.log('post', pnt.x, pnt.y)
+          })
+          // console.log(frame)
+          // frame[0].x = frame[4].x;
+          // frame[0].y = frame[4].y;
+          // console.log('ptAr', ptArr)
+        })
         this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
         this.points = [];
@@ -66,29 +116,6 @@ export default {
     }
   },
   methods:{
-    /*
-    zoomChange(){
-      let zoom;
-      if(this.zoomed){
-        this.zoomed = false;
-        zoom = .5;
-      }else{
-        this.zoomed = true;
-        zoom = 2;
-      }
-      this.strokes.forEach((stroke)=>{
-        for(let f = 0; f <= this.frameMax; f++){
-          if(stroke.points[f]){
-            stroke.points[f].forEach((pnt) => {
-              pnt.x = pnt.x *zoom;
-              pnt.y = pnt.y *zoom;
-            });
-          }
-        }
-      })
-      this.drawStrokes();
-    },
-    */
     frameChange(_frameN){
       this.frameN = _frameN;
       this.clear(0);
@@ -104,11 +131,6 @@ export default {
 
       this.drawStrokes();
       this.clear(1);
-      /*
-      for(const i in this.$refs.can){
-        this.clear(i);
-      }
-      */
     },
     clear(idx){
       const can = this.$refs.can[idx];
@@ -132,9 +154,20 @@ export default {
 
       this.strokes.forEach((stroke)=>{
         if(stroke.points[this.frameN]){
-          this.draw(0, stroke.points[this.frameN], stroke.col, stroke.lCol);
+          const strokeFrame = stroke.points[this.frameN];
+          // console.log(strokeFrame)
+          this.draw(0, strokeFrame, stroke.col, stroke.lCol);
         }
       })
+    },
+    debugDraw(pt){
+      const can = this.$refs.debugCan
+      const ctx = can.getContext('2d')
+      ctx.clearRect(0, 0, can.height, can.width)
+
+
+      console.log('draw')
+      ctx.fillRect(pt.x,pt.y, 2, 2)
     },
     draw(idx, path, col, lCol){
       const ctx = this.$refs.can[idx].getContext('2d');
@@ -174,52 +207,43 @@ export default {
       */
     },
     zoomChange(x, y){
-      // console.log(x, y);
-      // console.log(this.zoomed);
       if(this.zoomed){
         this.zoomed = false;
-        this.$refs.can[0].getContext('2d').scale(.5,.5);
-        // this.$refs.can[0].getContext('2d').translate(-x,-y);
+        this.zoomSize = 1;
+        x = 0;
+        y = 0;
       }else{
         this.zoomed = true;
-        this.$refs.can[0].getContext('2d').scale(2,2);
-        // this.$refs.can[0].getContext('2d').translate(x,y);
-      }
-      this.drawStrokes();
-      /*
-      let zoom;
-      let offsetX = 0;
-      let offsetY = 0;
-      if(this.zoomed){
-        this.zoomed = false;
-        zoom = .25;
-        if(offsetX){
-          offsetX = -1 * offsetX;
-        }
-        offsetX = 0;
+        this.zoomSize = 3;
 
-        if(offsetY){
-          offsetY = -1 * offsetY;
+        if(y <= 45 || y >= 275){
+          if(y <= 45){
+            y = 5
+          }
+
+          if(y >= 275){
+            y = 375
+          }
+        } else {
+          // y = y + 130
         }
-        offsetY = 0;
-      }else{
-        this.zoomed = true;
-        zoom = 4;
-        offsetX = 100;
-        offsetY = 100;
-      }
-      this.strokes.forEach((stroke)=>{
-        for(let f = 0; f <= this.frameMax; f++){
-          if(stroke.points[f]){
-            stroke.points[f].forEach((pnt) => {
-              pnt.x = Math.round(pnt.x *zoom) + offsetX;
-              pnt.y = Math.round(pnt.y *zoom) + offsetY;
-            });
+
+        if(x <= 70 || x >= 316){
+          if(x <= 70){
+            x = 0
+          }
+
+          if(x >= 316){
+            x = 400
           }
         }
-      })
-      this.drawStrokes();
-      */
+      }
+
+      this.zoomOffset.x = (x*-1)*(this.zoomSize-1);
+      this.zoomOffset.y = (y*-1)*(this.zoomSize-1);
+
+      this.$refs.can[0].getContext('2d').setTransform(this.zoomSize, 0, 0, this.zoomSize, this.zoomOffset.x, this.zoomOffset.y);
+      // this.drawStrokes();
     },
     renderCan(){
       const w = window.innerWidth;
@@ -263,6 +287,18 @@ export default {
   mounted(){
     const w = window.innerWidth;
 
+    this.debugDraw({x: 100, y: 100})
+
+    document.addEventListener('keydown', (e)=>{
+      if(e.which == 90){
+        if(!this.zoom){
+          EventBus.$emit('toolToggle', 'Zoom')
+        }else{
+          EventBus.$emit('toolToggle', 'Brush')
+        }
+      }
+    });
+
     EventBus.$on('palletShown', (v) => {
       this.palletShow = v;
     });
@@ -291,9 +327,14 @@ export default {
     EventBus.$on('resize', this.renderCan);
 
     EventBus.$on('pDn', (e) => {
-      let x, y;
+      this.md = true;
+    });
+
+    EventBus.$on('pUp', (e) => {
+      this.md = false;
       const cont = document.getElementById('canvasContainer');
       const paintPos = cont.getBoundingClientRect();
+      let x, y;
       if(this.zoom){
         if(w <= 360){
           x = Math.round(e.offsetX - paintPos.x) - 65;
@@ -303,18 +344,27 @@ export default {
           y = Math.round(e.offsetY - paintPos.y) - 55;
         }
         this.zoomChange(x, y);
-      }
-      this.md = true;
-    });
-
-    EventBus.$on('pUp', (e) => {
-      this.md = false;
-      if(e.touches){
-        this.pntDn = false;
-        this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
-        this.points = [];
-        this.fpnt = null;
-        this.drawStrokes();
+        EventBus.$emit('toolToggle', 'Brush');
+      }else {
+        this.points.forEach((el, idx) => {
+            el.forEach((elm, idx2) => {
+              // elm.x = 100 + (elm.x / 2)
+              // elm.x = elm.x / (this.zoomSize+2)
+              // elm.y = elm.y / (this.zoomSize+2)
+              // elm.x =elm.x / (this.zoomSize - 4)
+              // elm.y = elm.y / (this.zoomSize - 4)
+              // console.log('x', elm.x, 'y', elm.y)
+              // elm.x = Math.round(elm.x / this.zoomSize)
+              // elm.y = Math.round(elm.y / this.zoomSize)
+            })
+        });
+        if(e.touches){
+          this.pntDn = false;
+          this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
+          this.drawStrokes();
+          this.points = [];
+          this.fpnt = null;
+        }
       }
     });
 
@@ -331,10 +381,13 @@ export default {
         y = Math.round(e.offsetY - paintPos.y) - 55;
       }
 
+      // console.log(x,y)
+
       if(this.md){
         this.curPos = {x: x, y: y};
       }else{
         this.curPos = null;
+        this.mPos = {x: x, y: y};
       }
 
     });
@@ -355,8 +408,8 @@ canvas{
   position: absolute;
   /* top: 40px; */
   /* left: 45px; */
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+  /* image-rendering: pixelated; */
+  /* image-rendering: crisp-edges; */
   }
 
   #canvasContainer{

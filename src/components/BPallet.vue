@@ -1,5 +1,5 @@
 <template>
-  <div id="palletContainer" v-if="!zoom">
+  <div id="palletContainer" v-show="!zoom">
     <!--
     <div style="position: relative; place-content: center; display:flex; height: 30px;">
       <div id="palletToggle" @click="showPallet" />
@@ -55,9 +55,11 @@ export default {
     return{
       zoom: false,
       selected: 'bg',
+      // color: null,
       color: new Color('000000'),
       palletShow: true,
       lineColor: null,
+      // lineColor: new Color('000000'),
       colors:[
         new Color('000000', '000000'),
         new Color('FFFFFF', 'FFFFFF'),

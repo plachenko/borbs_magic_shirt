@@ -22,7 +22,7 @@ export default {
   },
   data: function(){
     return{
-      speed: 40,
+      speed: 60,
       frameNum: 0,
       frameMax: 3,
       rec: false,

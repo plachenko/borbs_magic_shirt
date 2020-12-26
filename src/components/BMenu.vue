@@ -27,7 +27,7 @@ export default {
       menuItems: [
         { name: 'Save', method:  this.save },
         { name: 'Play', method: this.playToggle },
-        // { name: 'Zoom', method: this.toolToggle },
+        { name: 'Zoom', method: this.toolToggle },
         { name: 'Timeline', method: this.timelineToggle },
         { name: 'More', method: this.more }
       ]
@@ -35,6 +35,16 @@ export default {
   },
   mounted(){
     const w = window.innerWidth;
+    EventBus.$on('toolToggle', (e)=>{
+      switch(e){
+        case 'Brush':
+          this.menuItems[2].name = "Zoom"
+          break;
+        case 'Zoom':
+          this.menuItems[2].name = "Brush"
+          break;
+      }
+    });
     /*
     if(w < 400){
       this.menuItems.push(
