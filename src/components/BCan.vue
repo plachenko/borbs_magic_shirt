@@ -72,7 +72,6 @@ export default {
       }else{
         const ptArr = []
         this.points.forEach((frame, idx)=>{
-          // console.log('----')
           frame.forEach((pnt,pIdx) => {
             // console.log('x:', pnt.x,'f y', pnt.y)
             // console.log('pre', pnt.x, pnt.y)
