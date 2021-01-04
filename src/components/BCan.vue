@@ -63,49 +63,20 @@ export default {
           this.points[this.frameN] = [this.fpnt, pnt];
         }
 
-        // pnt.x = Math.round(pnt.x / this.zoomSize)
-        // pnt.y = Math.round(pnt.y / this.zoomSize)
         this.pos = pnt
 
         this.points[this.frameN].push(pnt);
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
       }else{
         const ptArr = []
+
         this.points.forEach((frame, idx)=>{
           frame.forEach((pnt,pIdx) => {
-            // console.log('x:', pnt.x,'f y', pnt.y)
-            // console.log('pre', pnt.x, pnt.y)
-            // pnt.x += frame[0].x + (pnt.x/this.zoomSize)
-            // pnt.y += frame[1].y + (pnt.y/this.zoomSize)
-            // pnt.x = pnt.x / this.zoomSize
-            // pnt.y = pnt.y / this.zoomSize
-            // pnt.x = (pnt.x / 3) + (firstStroke/3)
-            // this.pos.x = Math.round(window.innerWidth/2 - (e.offsetX + 200)) * -1
-            // this.pos.y = Math.round(window.innerHeight/2 - (e.offsetY + 200)) * -1
-
             pnt.x = pnt.x / this.zoomSize + (((this.zoomOffset.x) / 3)) * -1
             pnt.y = pnt.y / this.zoomSize + (((this.zoomOffset.y) / 3)) * -1
-            /*
-            if(this.zoomSize > 1){
-              pnt.x = (firstStroke?.x/this.zoomSize) + (pnt.x / this.zoomSize)
-              pnt.y = (firstStroke?.y/this.zoomSize) + (pnt.y / this.zoomSize)
-            }
-           if(this.zoomSize > 1){
-             if(pIdx < 9){
-             }else{
-                pnt.x = pnt.x / this.zoomSize + ((this.zoomOffset.x + frame[0].x) / 3) * -1
-                pnt.y = pnt.y / this.zoomSize + ((this.zoomOffset.y + frame[0].y) / 3) * -1
-             }
-           }
-            */
-
-            // console.log('post', pnt.x, pnt.y)
           })
-          // console.log(frame)
-          // frame[0].x = frame[4].x;
-          // frame[0].y = frame[4].y;
-          // console.log('ptAr', ptArr)
         })
+
         this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
         this.points = [];
