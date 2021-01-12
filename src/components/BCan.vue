@@ -48,9 +48,49 @@ export default {
   watch:{
     curPos(pnt){
       this.clear(1);
-
+      /*
       if(pnt && !this.zoom){
+        // When not zoomed in and there's a point...
+
         if(this.palletShow){
+          // If there is a pallet,
+          EventBus.$emit('palletShow', false);
+        }
+
+        if(!this.pntDn){
+          this.fpnt = Object.assign({}, pnt);
+          this.pntDn = true;
+        }
+
+        if(!this.points[this.frameN]){
+          this.points[this.frameN] = [this.fpnt, pnt];
+        }
+
+        this.pos = pnt
+
+        this.points[this.frameN].push(pnt);
+        this.draw(1, this.points[this.frameN], this.color, this.lineColor);
+      }else if(this.zoom){
+        // When zoomed in...
+        const ptArr = []
+
+        console.log('zooomies!!')
+
+        this.points.forEach((frame, idx)=>{
+          frame.forEach((pnt,pIdx) => {
+            // pnt.x = (pnt.x / this.zoomSize)
+            // pnt.y = (pnt.y / this.zoomSize)
+            // pnt.x = (pnt.x / this.zoomSize) + ((this.zoomOffset.x / this.zoomSize) * -1)
+            // pnt.y = (pnt.y / this.zoomSize) + ((this.zoomOffset.y / this.zoomSize) * -1)
+
+            // pnt.x = this.zoomOffset.x / this.zoomSize;
+            // pnt.y = this.zoomOffset.y / this.zoomSize;
+          });
+        });
+      */
+      if(pnt){
+        if(this.palletShow){
+          // If there is a pallet,
           EventBus.$emit('palletShow', false);
         }
 
@@ -68,15 +108,25 @@ export default {
         this.points[this.frameN].push(pnt);
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
       }else{
-        const ptArr = []
+        if(this.zoomSize > 1){
 
-        this.points.forEach((frame, idx)=>{
-          frame.forEach((pnt,pIdx) => {
-            pnt.x = pnt.x / this.zoomSize + (((this.zoomOffset.x) / 3)) * -1
-            pnt.y = pnt.y / this.zoomSize + (((this.zoomOffset.y) / 3)) * -1
-          })
-        })
+          let fpt;
+          this.points.forEach((frame, idx)=>{
+            fpt = frame.length
+            frame.forEach((pnt,pIdx) => {
+              pnt.x = (pnt.x / this.zoomSize) - ((this.zoomOffset.x / this.zoomSize))
+              pnt.y = (pnt.y / this.zoomSize) - ((this.zoomOffset.y / this.zoomSize))
+              // pnt.x = (pnt.x / this.zoomSize) + (((this.zoomOffset.x / this.zoomSize) - (frame[0].x / 3))* -1)
+              // pnt.y = (pnt.y / this.zoomSize) + (((this.zoomOffset.y / this.zoomSize) - (frame[0].y / 3))* -1)
+              // console.log(fpt)
 
+              // pnt.x = this.zoomOffset.x / this.zoomSize;
+              // pnt.y = this.zoomOffset.y / this.zoomSize;
+            });
+          });
+          console.log('real zoomies.')
+          // console.log(this.zoomOffset, this.points[0][0])
+        }
         this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
         this.points = [];
@@ -125,7 +175,6 @@ export default {
       this.strokes.forEach((stroke)=>{
         if(stroke.points[this.frameN]){
           const strokeFrame = stroke.points[this.frameN];
-          // console.log(strokeFrame)
           this.draw(0, strokeFrame, stroke.col, stroke.lCol);
         }
       })
@@ -135,8 +184,6 @@ export default {
       const ctx = can.getContext('2d')
       ctx.clearRect(0, 0, can.height, can.width)
 
-
-      console.log('draw')
       ctx.fillRect(pt.x,pt.y, 2, 2)
     },
     draw(idx, path, col, lCol){
@@ -151,6 +198,10 @@ export default {
       ctx.moveTo(path[0].x, path[0].y);
       path.forEach((point, i) => {
         ctx.lineTo(point.x, point.y);
+        /*
+        setInterval(() => {
+        }, 1000)
+        */
       });
 
       // if(this.points){
