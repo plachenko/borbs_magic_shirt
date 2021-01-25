@@ -4,6 +4,7 @@ export default class Color{
   public blue = 0;
   public idx = 1;
   public colors: any[];
+  public mixType = 0;
 
   constructor(hex: string, hex2: string | null = null){
     this.colors = [hex, hex2];
@@ -24,22 +25,29 @@ export default class Color{
   }
 
   public mix(color: Color){
-    return color.swap()
-    /*
-    const mixAmt = 3;
-    const rdiff = Math.floor((color.red - this.red) / mixAmt);
-    const bdiff = Math.floor((color.blue - this.blue) / mixAmt);
-    const gdiff = Math.floor((color.green - this.green) / mixAmt);
+    if(this.mixType == 0){
+      return color.swap()
+    }else if(this.mixType == 1){
+      // Old color mixing code taken out by tom's request to swap colors instead. This can be controlled by setting the public
+      // variable 'mixType' to 1. Currently won't work in this implementation since it requires the color class to use its
+      // internal RGB values rather than two passed in colors. Would take some refactoring to get this to work again.
 
-    if(this.red >= 0 && this.red <= 255)
-      this.red += rdiff;
+      const mixAmt = 3;
+      const rdiff = Math.floor((color.red - this.red) / mixAmt);
+      const bdiff = Math.floor((color.blue - this.blue) / mixAmt);
+      const gdiff = Math.floor((color.green - this.green) / mixAmt);
 
-    if(this.blue >= 0 && this.blue <= 255)
-      this.blue += bdiff;
+      console.log(rdiff, bdiff, gdiff)
 
-    if(this.green >= 0 && this.green <= 255)
-      this.green += gdiff;
-    */
+      if(this.red >= 0 && this.red <= 255)
+        this.red += rdiff;
+
+      if(this.blue >= 0 && this.blue <= 255)
+        this.blue += bdiff;
+
+      if(this.green >= 0 && this.green <= 255)
+        this.green += gdiff;
+    }
   }
 
   public hexToRgb(_hex: string){
