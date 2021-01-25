@@ -98,7 +98,7 @@ export default {
         EventBus.$emit('color', this.color);
       } else if(this.selected == 'line'){
         if(this.lineColor){
-          this.lineColor = new Color(this.color.mix(val, this.firstColor));
+          this.lineColor = new Color(this.lineColor.mix(val, this.firstColor));
         }else{
           this.lineColor = new Color(val.hex);
         }
