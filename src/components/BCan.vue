@@ -1,7 +1,5 @@
 <template>
   <div id="canvasContainer" ref="canContainer">
-    <div style="position: absolute; top: -20px;left: -100px">{{zoomOffset}}</div>
-    <div style="position: absolute; top: -20px;">X: {{Math.round(mPos.x/zoomSize)}} Y: {{Math.round(mPos.y/zoomSize)}}</div>
     <div style="width: 80%; display: flex; place-content: center;">
       <div id="canvasImg" />
 
@@ -109,7 +107,6 @@ export default {
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
       }else{
         if(this.zoomSize > 1){
-
           let fpt;
           this.points.forEach((frame, idx)=>{
             fpt = frame.length
@@ -124,8 +121,6 @@ export default {
               // pnt.y = this.zoomOffset.y / this.zoomSize;
             });
           });
-          console.log('real zoomies.')
-          // console.log(this.zoomOffset, this.points[0][0])
         }
         this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
