@@ -106,6 +106,22 @@ export default {
         this.points[this.frameN].push(pnt);
         this.draw(1, this.points[this.frameN], this.color, this.lineColor);
       }else{
+
+        let fpt;
+        this.points.forEach((frame, idx) => {
+          fpt = frame[0]
+          // console.log(fpt.x, fpt.y)
+          frame.forEach((pnt, pIdx) => {
+            console.log(pIdx);
+
+            if(pIdx >= 1 && pIdx <= frame.length-1){
+              pnt.x = Math.round((pnt.x / this.zoomSize) - (this.zoomOffset.x / this.zoomSize));
+              pnt.y = Math.round((pnt.y / this.zoomSize) - (this.zoomOffset.y / this.zoomSize));
+            }
+          });
+        });
+
+        /*
         if(this.zoomSize > 1){
           let fpt;
           this.points.forEach((frame, idx)=>{
@@ -122,6 +138,7 @@ export default {
             });
           });
         }
+        */
         this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
         this.points = [];
@@ -212,7 +229,7 @@ export default {
       }
 
       if(lCol){
-        ctx.lineWidth =  3;
+        ctx.lineWidth =  3 / this.zoomSize;
         ctx.strokeStyle = '#' + lCol;
         ctx.stroke();
       }
@@ -255,8 +272,8 @@ export default {
         }
       }
 
-      this.zoomOffset.x = (x*-1)*(this.zoomSize-1);
-      this.zoomOffset.y = (y*-1)*(this.zoomSize-1);
+      this.zoomOffset.x = (x * -1) * (this.zoomSize - 1);
+      this.zoomOffset.y = (y * -1) * (this.zoomSize - 1);
 
       this.$refs.can[0].getContext('2d').setTransform(this.zoomSize, 0, 0, this.zoomSize, this.zoomOffset.x, this.zoomOffset.y);
       // this.drawStrokes();

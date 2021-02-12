@@ -147,6 +147,11 @@ export default {
       renderCan.width = canLyr.width - 10;
       renderCan.height = canLyr.height - 10;
 
+      // If zoomed zoom out for the gif capture first.
+      if(canRef.zoomSize > 1){
+        canRef.zoomChange();
+      }
+
       const gif = new GIF({
           workers: 4,
           width: renderCan.width,
