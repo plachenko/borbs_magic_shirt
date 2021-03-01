@@ -112,12 +112,10 @@ export default {
           fpt = frame[0]
           // console.log(fpt.x, fpt.y)
           frame.forEach((pnt, pIdx) => {
-            console.log(pIdx);
+            // console.log(pIdx);
 
-            if(pIdx >= 1 && pIdx <= frame.length-1){
-              pnt.x = Math.round((pnt.x / this.zoomSize) - (this.zoomOffset.x / this.zoomSize));
-              pnt.y = Math.round((pnt.y / this.zoomSize) - (this.zoomOffset.y / this.zoomSize));
-            }
+            pnt.x = Math.round((pnt.x / this.zoomSize) - (this.zoomOffset.x / this.zoomSize));
+            pnt.y = Math.round((pnt.y / this.zoomSize) - (this.zoomOffset.y / this.zoomSize));
           });
         });
 
