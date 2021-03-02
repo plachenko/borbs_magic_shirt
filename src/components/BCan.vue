@@ -138,21 +138,31 @@ export default {
           });
         }
         */
-       console.log(this.points);
-        let timer = 0;
+      //  console.log(this.points);
+        // let timer = 0;
+        // console.log(timer < this.points[0].length)
+        /*
         setInterval(()=>{
-          timer++
-          if(timer < this.points.length){
-            this.strokes.push({points: this.points.slice(0, timer), col: this.color, lCol: this.lineColor});
-            // this.strokes[0] = {points: this.points.slice(0, timer), col: this.color, lCol: this.lineColor}
+          if(timer < this.points[0].length){
+            this.clear(1);
+            // this.strokes.push({points: this.points.slice(0, timer), col: this.color, lCol: this.lineColor});
+            this.strokes[0] = {points: this.points.slice(0, timer), col: this.color, lCol: this.lineColor}
             this.drawStrokes();
             console.log('hi', timer)
+            timer++
+          }
+          if(timer == this.points[0].length-1){
+            this.pntDn = false;
+
+            this.points = [];
+            this.fpnt = null;
           }
         },100)
-        this.pntDn = false;
+        */
+        // this.pntDn = false;
         // this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
-        this.points = [];
-        this.fpnt = null;
+        // this.points = [];
+        // this.fpnt = null;
         // this.drawStrokes();
       }
     }
