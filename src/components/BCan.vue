@@ -109,13 +109,14 @@ export default {
 
         let fpt;
         this.points.forEach((frame, idx) => {
-          fpt = frame[0]
+          fpt = frame[0];
           // console.log(fpt.x, fpt.y)
           frame.forEach((pnt, pIdx) => {
-            // console.log(pIdx);
 
             pnt.x = Math.round((pnt.x / this.zoomSize) - (this.zoomOffset.x / this.zoomSize));
             pnt.y = Math.round((pnt.y / this.zoomSize) - (this.zoomOffset.y / this.zoomSize));
+
+            // console.log(pIdx, ' / ', frame.length-1)
           });
         });
 
@@ -137,11 +138,22 @@ export default {
           });
         }
         */
+       console.log(this.points);
+        let timer = 0;
+        setInterval(()=>{
+          timer++
+          if(timer < this.points.length){
+            this.strokes.push({points: this.points.slice(0, timer), col: this.color, lCol: this.lineColor});
+            // this.strokes[0] = {points: this.points.slice(0, timer), col: this.color, lCol: this.lineColor}
+            this.drawStrokes();
+            console.log('hi', timer)
+          }
+        },100)
         this.pntDn = false;
-        this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
+        // this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
         this.points = [];
         this.fpnt = null;
-        this.drawStrokes();
+        // this.drawStrokes();
       }
     }
   },
@@ -238,6 +250,7 @@ export default {
       */
     },
     zoomChange(x, y){
+      this.clear(0);
       if(this.zoomed){
         this.zoomed = false;
         this.zoomSize = 1;
@@ -274,7 +287,7 @@ export default {
       this.zoomOffset.y = (y * -1) * (this.zoomSize - 1);
 
       this.$refs.can[0].getContext('2d').setTransform(this.zoomSize, 0, 0, this.zoomSize, this.zoomOffset.x, this.zoomOffset.y);
-      // this.drawStrokes();
+      this.drawStrokes();
     },
     renderCan(){
       const w = window.innerWidth;
@@ -422,7 +435,7 @@ export default {
       }
 
     });
-    EventBus.$on('frameChange', this.frameChange);
+    // EventBus.$on('frameChange', this.frameChange);
     EventBus.$on('clearCan', this.clearAll);
     EventBus.$on('toolToggle', (tool) => {
       if(tool == 'Zoom'){
