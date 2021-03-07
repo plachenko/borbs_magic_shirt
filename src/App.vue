@@ -83,6 +83,9 @@ export default {
     EventBus.$on('ghLink', () => {
       window.open('https://www.github.com/plachenko/borbs_magic_shirt');
     })
+    EventBus.$on('ghLink2', () => {
+      window.open('https://www.github.com/plachenko/borbs_magic_shirt/issues');
+    })
     EventBus.$on('fsToggle', () =>{
       if(this.fs){
         this.fs = false;

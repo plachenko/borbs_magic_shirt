@@ -61,7 +61,8 @@ export default {
           items: [
             {name: 'Clear', method: 'clearCan'},
             {name: 'Fullscreen', method: 'fsToggle'},
-            {name: 'View Source / Report Bug', method: 'ghLink'},
+            {name: 'Report Bug / Suggest Feature', method: 'ghLink2'},
+            {name: 'View Source', method: 'ghLink'}
             // {name: 'Pallet', method: 'stuff'},
           ]
         };
