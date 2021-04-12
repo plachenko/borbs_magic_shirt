@@ -1,5 +1,5 @@
 <template>
-  <div id="palletContainer" v-if="!zoom">
+  <div id="palletContainer" v-show="!zoom">
     <!--
     <div style="position: relative; place-content: center; display:flex; height: 30px;">
       <div id="palletToggle" @click="showPallet" />
@@ -96,7 +96,7 @@ export default {
         EventBus.$emit('color', this.color);
       } else if(this.selected == 'line'){
         if(this.lineColor){
-          this.lineColor = new Color(this.color.mix(val, this.firstColor));
+          this.lineColor = new Color(this.lineColor.mix(val, this.firstColor));
         }else{
           this.lineColor = new Color(val.hex);
         }

@@ -1,5 +1,6 @@
 <template>
   <div ref="brush" id="brush">
+    <div class="magBorder" v-show="zoom && zoomed"></div>
     <canvas v-show="!zoom" :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9989;"/>
     <canvas v-show="!zoom" id="lineTip" :style="{opacity: !lineColor ? 0 : 1}" width="26" height="19" ref="linetip" style="left: -2px; position: absolute; z-index:9988;"/>
     <img v-if="zoom" :class="{disabled: !color}" style="left: -10px; top: -20px; position: absolute; z-index: 83;" src="../assets/magnifying.png" id="tip" />
@@ -19,7 +20,8 @@ export default {
       palletShow: false,
       tipImg: null,
       color: "000000",
-      lineColor: null
+      zoomed: true,
+      lineColor: null,
     }
   },
   methods:{
@@ -59,6 +61,8 @@ export default {
       }else if(e == 'Brush'){
         this.zoom = false;
       }
+      // this.zoomed = !this.zoomed
+      // console.log(this.zoomed)
     });
 
     EventBus.$on('color', (c) => {
@@ -103,17 +107,23 @@ export default {
 
       EventBus.$on('pUp', (e)=>{
         if(!this.zoom){
-          this.$refs.tipBG.style.top = "0px";
-          this.$refs.tipBG.style.left = "0px";
-          this.$refs.tipBG.style.transform = "rotate(0deg)";
+          if(this.$refs.tipBG){
+            this.$refs.tipBG.style.top = "0px";
+            this.$refs.tipBG.style.left = "0px";
+            this.$refs.tipBG.style.transform = "rotate(0deg)";
+          }
 
-          this.$refs.linetip.style.top = "-1px";
-          this.$refs.linetip.style.left = "-4px";
-          this.$refs.linetip.style.transform = "rotate(0deg)";
+          if(this.$refs.linetip){
+            this.$refs.linetip.style.top = "-1px";
+            this.$refs.linetip.style.left = "-4px";
+            this.$refs.linetip.style.transform = "rotate(0deg)";
+          }
 
-          this.$refs.tip.style.top = "0px";
-          this.$refs.tip.style.left = "0px";
-          this.$refs.tip.style.transform = "rotate(0deg)";
+          if(this.$refs.tip){
+            this.$refs.tip.style.top = "0px";
+            this.$refs.tip.style.left = "0px";
+            this.$refs.tip.style.transform = "rotate(0deg)";
+          }
         }
       });
 
@@ -145,27 +155,29 @@ export default {
       });
 
       EventBus.$on('pMv', (e)=>{
-        const top = e.offsetY;
+        let top = e.offsetY;
+        let left = e.offsetX;
 
         if(this.palletShow){
           this.$refs.brush.style.transform = "scaleY(1)"
           this.palletShow = false;
         }
 
-        if(!this.zoom){
-          /*
-          if(e.offsetY > window.innerHeight - window.innerHeight/5 && !this.palletShow){
-            this.palletShow = true;
-            top = e.offsetY - 45;
-            this.$refs.brush.style.transform = "scaleY(-1)"
-            EventBus.$emit('palletShow', true);
-          } else if(e.offsetY < window.innerHeight - window.innerHeight/9){
-            top = e.offsetY
-            this.$refs.brush.style.transform = "scaleY(1)"
-            this.palletShow = false;
-            EventBus.$emit('palletShow', false);
+        if(this.zoom){
+          if(e.offsetY < window.innerHeight/2 - 135){
+            top = window.innerHeight/2 - 135;
+          } else if(e.offsetY > window.innerHeight/2 + 90) {
+            top = window.innerHeight/2 + 90;
           }
-          */
+
+          if(e.offsetX < window.innerWidth/2 - 120){
+            left = window.innerWidth/2 - 120;
+          } else if(e.offsetX > window.innerWidth/2 + 120) {
+            left = window.innerWidth/2 + 120;
+          }
+
+          this.renderPos(left, top);
+          return
         }
 
         this.renderPos(e.offsetX, top);
@@ -205,6 +217,14 @@ export default {
     }
     #lineTip .disabled{
       opacity: 0 !important;
+    }
+    .magBorder{
+      border: 1px solid;
+      position: absolute;
+      left: -50px;
+      top: -50px;
+      width: 130px;
+      height: 130px
     }
 
 </style>
