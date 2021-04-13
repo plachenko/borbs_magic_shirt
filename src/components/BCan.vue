@@ -35,6 +35,10 @@ export default {
       points: [],
       strokes: [],
       frameN: 0,
+      zoomSize: 1,
+      zoomOffset: {x: 0, y: 0},
+      pos: {x: 0, y:0},
+      mPos: {x: 0, y:0}
     }
   },
   watch:{
@@ -66,29 +70,6 @@ export default {
     }
   },
   methods:{
-    /*
-    zoomChange(){
-      let zoom;
-      if(this.zoomed){
-        this.zoomed = false;
-        zoom = .5;
-      }else{
-        this.zoomed = true;
-        zoom = 2;
-      }
-      this.strokes.forEach((stroke)=>{
-        for(let f = 0; f <= this.frameMax; f++){
-          if(stroke.points[f]){
-            stroke.points[f].forEach((pnt) => {
-              pnt.x = pnt.x *zoom;
-              pnt.y = pnt.y *zoom;
-            });
-          }
-        }
-      })
-      this.drawStrokes();
-    },
-    */
     frameChange(_frameN){
       this.frameN = _frameN;
       this.clear(0);
@@ -174,40 +155,29 @@ export default {
       */
     },
     zoomChange(x, y){
-      // console.log(x, y);
-      // console.log(this.zoomed);
+      /*
+        Zoom change method that adjusts stroke positions
+      */
+
       if(this.zoomed){
         this.zoomed = false;
         this.$refs.can[0].getContext('2d').scale(.5,.5);
+        this.zoomSize = 1;
         // this.$refs.can[0].getContext('2d').translate(-x,-y);
       }else{
         this.zoomed = true;
         this.$refs.can[0].getContext('2d').scale(2,2);
+        this.zoomSize = 3;
         // this.$refs.can[0].getContext('2d').translate(x,y);
       }
       this.drawStrokes();
-      /*
-      let zoom;
-      let offsetX = 0;
-      let offsetY = 0;
-      if(this.zoomed){
-        this.zoomed = false;
-        zoom = .25;
-        if(offsetX){
-          offsetX = -1 * offsetX;
-        }
-        offsetX = 0;
 
-        if(offsetY){
-          offsetY = -1 * offsetY;
-        }
-        offsetY = 0;
-      }else{
-        this.zoomed = true;
-        zoom = 4;
-        offsetX = 100;
-        offsetY = 100;
-      }
+      let zoom;
+      // let offsetX = 0;
+      // let offsetY = 0;
+
+      // TODO: Why did I put this here!?
+      /*
       this.strokes.forEach((stroke)=>{
         for(let f = 0; f <= this.frameMax; f++){
           if(stroke.points[f]){
@@ -218,8 +188,9 @@ export default {
           }
         }
       })
-      this.drawStrokes();
       */
+
+      this.drawStrokes();
     },
     renderCan(){
       const w = window.innerWidth;
@@ -262,6 +233,16 @@ export default {
   },
   mounted(){
     const w = window.innerWidth;
+
+    document.addEventListener('keydown', (e)=>{
+      if(e.which == 90){
+        if(!this.zoom){
+          EventBus.$emit('toolToggle', 'Zoom')
+        }else{
+          EventBus.$emit('toolToggle', 'Brush')
+        }
+      }
+    });
 
     EventBus.$on('palletShown', (v) => {
       this.palletShow = v;
@@ -309,6 +290,8 @@ export default {
 
     EventBus.$on('pUp', (e) => {
       this.md = false;
+      EventBus.$emit('toolToggle', 'Brush');
+
       if(e.touches){
         this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});

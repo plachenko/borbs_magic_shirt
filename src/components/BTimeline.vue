@@ -5,7 +5,7 @@
     <span style="display: inline-block; margin-right: 5px;">frame: {{frameNum}}</span>
     <input style="width: 40px;" type="range" v-model="frameNum" :max="frameMax">
     <span style="display: inline-block; margin:0px 5px;">speed: </span>
-    <input type="number" style="width: 40px; margin-right: 5px;" min="1" max="100" v-model="speed" />
+    <input type="number" style="width: 40px; margin-right: 5px;" min="1" v-model="speed" />
   </div>
 </template>
 <script>
