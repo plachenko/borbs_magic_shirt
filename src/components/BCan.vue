@@ -158,6 +158,7 @@ export default {
       /*
         Zoom change method that adjusts stroke positions
       */
+      console.log('zooming', x, y);
 
       if(this.zoomed){
         this.zoomed = false;
@@ -283,6 +284,8 @@ export default {
           x = Math.round(e.offsetX - paintPos.x) - 25;
           y = Math.round(e.offsetY - paintPos.y) - 55;
         }
+
+
         this.zoomChange(x, y);
       }
       this.md = true;
@@ -314,6 +317,12 @@ export default {
         y = Math.round(e.offsetY - paintPos.y) - 55;
       }
 
+      y = y <= 0 ? 0 : y;
+      y = y >= 450 ? 450 : y;
+
+      x = x <= 0 ? 0 : x;
+      x = x >= 450 ? 450 : x;
+
       if(this.md){
         this.curPos = {x: x, y: y};
       }else{
@@ -321,6 +330,7 @@ export default {
       }
 
     });
+
     EventBus.$on('frameChange', this.frameChange);
     EventBus.$on('clearCan', this.clearAll);
     EventBus.$on('toolToggle', (tool) => {
