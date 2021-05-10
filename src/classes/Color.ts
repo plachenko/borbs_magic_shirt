@@ -3,7 +3,7 @@ export default class Color{
   public green = 0;
   public blue = 0;
   public idx = 1;
-  public colors: any[];
+  public colors: (string|null)[];
 
   constructor(hex: string, hex2: string | null = null){
     this.colors = [hex, hex2];

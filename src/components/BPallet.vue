@@ -240,9 +240,6 @@ export default {
     z-index: 9991;
     cursor: pointer;
   }
-  .preview{
-    /* opacity: 0; */
-  }
   #fillPrev{
     z-index: 9991;
     position: absolute;

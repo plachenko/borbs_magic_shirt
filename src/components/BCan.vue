@@ -35,6 +35,10 @@ export default {
       points: [],
       strokes: [],
       frameN: 0,
+      zoomSize: 1,
+      zoomOffset: {x: 0, y: 0},
+      pos: {x: 0, y:0},
+      mPos: {x: 0, y:0}
     }
   },
   watch:{
@@ -146,7 +150,7 @@ export default {
 
       ctx.beginPath();
       ctx.moveTo(path[0].x, path[0].y);
-      path.forEach((point, i) => {
+      path.forEach((point) => {
         ctx.lineTo(point.x, point.y);
       });
 
@@ -174,7 +178,7 @@ export default {
       */
     },
     zoomChange(x, y){
-      // console.log(x, y);
+      console.log(x, y);
       // console.log(this.zoomed);
       if(this.zoomed){
         this.zoomed = false;
@@ -263,6 +267,16 @@ export default {
   mounted(){
     const w = window.innerWidth;
 
+    document.addEventListener('keydown', (e)=>{
+      if(e.code == 'KeyW'){
+        if(!this.zoom){
+          EventBus.$emit('toolToggle', 'Zoom')
+        }else{
+          EventBus.$emit('toolToggle', 'Brush')
+        }
+      }
+    });
+
     EventBus.$on('palletShown', (v) => {
       this.palletShow = v;
     });
@@ -309,6 +323,8 @@ export default {
 
     EventBus.$on('pUp', (e) => {
       this.md = false;
+      EventBus.$emit('toolToggle', 'Brush');
+
       if(e.touches){
         this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
