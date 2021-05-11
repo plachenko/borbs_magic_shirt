@@ -1,6 +1,6 @@
 <template>
   <div ref="brush" id="brush">
-    <div class="magBorder" v-show="zoom"></div>
+    <div id="magBorder" v-show="zoom"></div>
     <canvas v-show="!zoom" :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9989;"/>
     <canvas v-show="!zoom" id="lineTip" :style="{opacity: !lineColor ? 0 : 1}" width="26" height="19" ref="linetip" style="left: -2px; position: absolute; z-index:9988;"/>
     <img v-if="zoom" :class="{disabled: !color}" style="left: -10px; top: -20px; position: absolute; z-index: 83;" src="../assets/magnifying.png" id="tip" />
@@ -212,7 +212,7 @@ export default {
       opacity: 0 !important;
     }
 
-    .magBorder{
+    #magBorder{
       border: 1px solid;
       position: absolute;
       left: -50px;

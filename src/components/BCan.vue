@@ -183,11 +183,13 @@ export default {
       if(this.zoomed){
         this.zoomed = false;
         this.$refs.can[0].getContext('2d').scale(.5,.5);
-        // this.$refs.can[0].getContext('2d').translate(-x,-y);
+        this.zoomSize = 1;
+        this.$refs.can[0].getContext('2d').translate(-x,-y);
       }else{
         this.zoomed = true;
         this.$refs.can[0].getContext('2d').scale(2,2);
-        // this.$refs.can[0].getContext('2d').translate(x,y);
+        this.zoomSize = 3;
+        this.$refs.can[0].getContext('2d').translate(x,y);
       }
       this.drawStrokes();
       /*
@@ -334,8 +336,10 @@ export default {
       }
     });
 
+    const mag = document.getElementById('magBorder');
+    const cont = document.getElementById('canvasContainer');
+
     EventBus.$on('pMv', (e) => {
-      const cont = document.getElementById('canvasContainer');
       const paintPos = cont.getBoundingClientRect();
       let x, y;
 
@@ -346,6 +350,8 @@ export default {
         x = Math.round(e.offsetX - paintPos.x) - 25;
         y = Math.round(e.offsetY - paintPos.y) - 55;
       }
+
+      console.log(x, y);
 
       if(this.md){
         this.curPos = {x: x, y: y};
