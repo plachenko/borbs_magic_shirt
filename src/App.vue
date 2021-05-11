@@ -24,15 +24,22 @@
     <div id="container">
       <div id="middle">
         <!-- Reference Image that loads -->
-        <div id="refImg" ref="refImg"></div>
+        <div id="refImg" ref="refImg">
+          <div id="canTransfer" @click="putOnCanvas">
+            <span v-if="!refOnCan">Put on Canvas</span>
+            <span v-else>Remove</span>
+          </div>
+        </div>
 
         <!-- Menu items. -->
         <BMenu ref="menu" @modalShow="modalShow($event)" @modalExit="modalExit" />
         <BTimeline ref="timeline" v-show="timelineShow" />
 
         <!-- Paint Canvas -->
-        <BCan ref="paintCan" @strokeEvt="saveStrokes" />
+        <BCan id="paintCan" ref="paintCan" @strokeEvt="saveStrokes" />
         <!-- <BCan :frameMax="fMax" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" /> -->
+
+        <!-- <div id="refImgCan" v-show="refOnCan" ref="refImgCan" /> -->
 
         <!-- Paint Pallet -->
         <BPallet />
@@ -102,7 +109,9 @@ export default {
     return{
       fs: false,
       timelineShow: false,
-      modalOpts: null
+      modalOpts: null,
+      imgURL: null,
+      refOnCan: false
     }
   },
   methods:{
@@ -188,6 +197,7 @@ export default {
       const target = e.target.files;
       const url = URL.createObjectURL(target[0])
       let delay = 0;
+      this.imgURL = url;
 
       this.modalExit();
       if(this.refOpen){
@@ -201,6 +211,10 @@ export default {
 
       gsap.to('#refImg', 1, {top: 10, delay: delay});
       this.refOpen = true;
+    },
+    putOnCanvas(){
+      this.refOnCan = !this.refOnCan;
+      this.$refs.refImgCan.style.backgroundImage = "url(" + this.imgURL + ")";
     }
   }
 }
@@ -258,4 +272,41 @@ html, body{
     top: -230px;
     border: 2px solid;
     }
+    #canTransfer{
+      position: absolute;
+      bottom: -32px;
+      width: 100%;
+      text-align: center;
+      background-color:#F00;
+      color: #FFF;
+      }
+      #canTransfer span{
+        padding: 5px;
+        width: 100%;
+        display: inline-block;
+      }
+      #canTransfer :hover{
+        cursor: pointer;
+        padding: 5px 0px;
+        background-color:#F44;
+      }
+
+      /*
+      #paintCan{
+        z-index: 1;
+        position: absolute;
+      }
+      */
+
+      /*
+      #refImgCan{
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 440px;
+        height: 375px;
+        position: absolute;
+        left: 0px;
+        top: 95px;
+        z-index: 0;
+        }*/
 </style>
