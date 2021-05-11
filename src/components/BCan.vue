@@ -62,6 +62,7 @@ export default {
         this.points = [];
         this.fpnt = null;
         this.drawStrokes();
+        this.$emit('strokeEvt');
       }
     }
   },
