@@ -357,8 +357,8 @@ canvas{
   position: absolute;
   /* top: 40px; */
   /* left: 45px; */
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+  /* image-rendering: pixelated; */
+  /* image-rendering: crisp-edges; */
   }
 
   #canvasContainer{
