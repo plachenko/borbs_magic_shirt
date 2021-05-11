@@ -36,10 +36,10 @@
         <BTimeline ref="timeline" v-show="timelineShow" />
 
         <!-- Paint Canvas -->
-        <BCan id="paintCan" ref="paintCan" @strokeEvt="saveStrokes" />
+        <BCan ref="paintCan" @strokeEvt="saveStrokes" />
         <!-- <BCan :frameMax="fMax" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" /> -->
 
-        <!-- <div id="refImgCan" v-show="refOnCan" ref="refImgCan" /> -->
+        <div id="refImgCan" v-show="refOnCan" ref="refImgCan" />
 
         <!-- Paint Pallet -->
         <BPallet />
@@ -298,7 +298,6 @@ html, body{
       }
       */
 
-      /*
       #refImgCan{
         background-repeat: no-repeat;
         background-position: center;
@@ -308,5 +307,5 @@ html, body{
         left: 0px;
         top: 95px;
         z-index: 0;
-        }*/
+        }
 </style>

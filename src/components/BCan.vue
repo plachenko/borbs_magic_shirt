@@ -126,8 +126,8 @@ export default {
     },
     drawBG(){
       const underCan = this.$refs.can[0].getContext('2d');
-      underCan.fillStyle = "#FFF";
-      underCan.fillRect(0,0,this.$refs.can[0].width, this.$refs.can[0].height);
+      // underCan.fillStyle = "#FFF";
+      // underCan.fillRect(0,0,this.$refs.can[0].width, this.$refs.can[0].height);
     },
     drawStrokes(){
       this.drawBG();
