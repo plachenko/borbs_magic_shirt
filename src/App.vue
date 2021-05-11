@@ -9,7 +9,7 @@
     -->
 
     <!-- Modal that appears for extras -->
-    <BModal :modalOpts="modalOpts" v-if="modalOpts" @exit="modalExit" />
+    <BModal :modalOpts="modalOpts" :strokeNum="$refs.paintCan.strokes.length" v-if="modalOpts" @exit="modalExit" />
 
     <input type="file" ref="file" @change="load" style="display:none" />
 

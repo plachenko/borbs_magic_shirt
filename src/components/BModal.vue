@@ -2,6 +2,7 @@
   <div id="modalCont">
     <div id="bg" @click="exit" />
     <div id="modalWhite">
+      <span id="strokeNum">Stroke Count: {{strokeNum}}</span>
       <h3>{{modalOpts.title}}</h3>
       <div id="modalInner">
 
@@ -44,6 +45,10 @@ export default {
       default: () =>{
         return {};
       }
+    },
+    strokeNum: {
+      type: Number,
+      default: 0
     }
   },
   methods:{
@@ -81,6 +86,14 @@ export default {
   z-index: 9999;
   /* overflow-y: scroll; */
   /* max-height: 400px; */
+  }
+  #strokeNum{
+    position: absolute;
+    bottom: -30px;
+    left: 0px;
+    width: 100%;
+    text-align: center;
+    color:#FFF;
   }
   h3{
     position: absolute;
