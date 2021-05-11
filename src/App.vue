@@ -9,7 +9,7 @@
     -->
 
     <!-- Modal that appears for extras -->
-    <BModal :modalOpts="modalOpts" v-if="modalOpts" @exit="modalExit" />
+    <BModal :modalOpts="modalOpts" :strokeNum="$refs.paintCan.strokes.length" v-if="modalOpts" @exit="modalExit" />
 
     <input type="file" ref="file" @change="load" style="display:none" />
 
@@ -31,7 +31,7 @@
         <BTimeline ref="timeline" v-show="timelineShow" />
 
         <!-- Paint Canvas -->
-        <BCan ref="paintCan" />
+        <BCan ref="paintCan" @strokeEvt="saveStrokes" />
         <!-- <BCan :frameMax="fMax" ref="paintCan" id="paintCan" :lineColor="lineColor ? lineColor.hex : null" :curPos="curPos" :color="color ? color.hex : null" /> -->
 
         <!-- Paint Pallet -->
@@ -73,6 +73,11 @@ export default {
     BTimeline
   },
   mounted(){
+
+    if(localStorage.getItem('strokes')){
+      this.loadStrokes();
+    }
+
     EventBus.$on('timelineToggle', () =>{
       this.timelineShow = !this.timelineShow;
     });
@@ -101,6 +106,15 @@ export default {
     }
   },
   methods:{
+    loadStrokes(){
+      const canRef = this.$refs.paintCan;
+      const lsStrokes = localStorage.getItem('strokes')
+      canRef.strokes = JSON.parse(lsStrokes || '{}');
+    },
+    saveStrokes(){
+      const canRef = this.$refs.paintCan;
+      localStorage.setItem('strokes', JSON.stringify(canRef.strokes));
+    },
     loadRef(){
       this.$refs.file.click();
     },

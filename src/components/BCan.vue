@@ -66,6 +66,7 @@ export default {
         this.points = [];
         this.fpnt = null;
         this.drawStrokes();
+        this.$emit('strokeEvt');
       }
     }
   },
@@ -108,6 +109,7 @@ export default {
 
       this.drawStrokes();
       this.clear(1);
+      this.$emit('strokeEvt');
       /*
       for(const i in this.$refs.can){
         this.clear(i);
@@ -377,8 +379,8 @@ canvas{
   position: absolute;
   /* top: 40px; */
   /* left: 45px; */
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+  /* image-rendering: pixelated; */
+  /* image-rendering: crisp-edges; */
   }
 
   #canvasContainer{
