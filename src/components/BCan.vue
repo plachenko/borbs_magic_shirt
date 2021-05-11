@@ -105,6 +105,7 @@ export default {
 
       this.drawStrokes();
       this.clear(1);
+      this.$emit('strokeEvt');
       /*
       for(const i in this.$refs.can){
         this.clear(i);
