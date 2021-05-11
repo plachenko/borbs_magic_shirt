@@ -4,6 +4,7 @@
       <div id="canvasImg" />
 
       <canvas
+        style="z-index: 2"
         v-for="(can, idx) in 2"
         :key="idx"
         ref="can"
