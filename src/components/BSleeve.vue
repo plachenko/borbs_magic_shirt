@@ -1,5 +1,6 @@
 <template>
   <div ref="brush" id="brush">
+    <div id="magBorder" v-show="zoom"></div>
     <canvas v-show="!zoom" :class="{disabled: !color}" width="26" height="19" ref="tip" style="left: 0px; position: absolute; z-index:9989;"/>
     <canvas v-show="!zoom" id="lineTip" :style="{opacity: !lineColor ? 0 : 1}" width="26" height="19" ref="linetip" style="left: -2px; position: absolute; z-index:9988;"/>
     <img v-if="zoom" :class="{disabled: !color}" style="left: -10px; top: -20px; position: absolute; z-index: 83;" src="../assets/magnifying.png" id="tip" />
@@ -19,7 +20,7 @@ export default {
       palletShow: false,
       tipImg: null,
       color: "000000",
-      lineColor: null
+      lineColor: null,
     }
   },
   methods:{
@@ -84,7 +85,7 @@ export default {
         this.tipChange();
       };
 
-      EventBus.$on('pDn', (e)=>{
+      EventBus.$on('pDn', ()=>{
         if(!this.zoom){
           this.$refs.tipBG.style.top = "-4px";
           this.$refs.tipBG.style.left = "6px";
@@ -101,30 +102,34 @@ export default {
         }
       });
 
-      EventBus.$on('pUp', (e)=>{
+      EventBus.$on('pUp', ()=>{
         if(!this.zoom){
-          this.$refs.tipBG.style.top = "0px";
-          this.$refs.tipBG.style.left = "0px";
-          this.$refs.tipBG.style.transform = "rotate(0deg)";
-
-          this.$refs.linetip.style.top = "-1px";
-          this.$refs.linetip.style.left = "-4px";
-          this.$refs.linetip.style.transform = "rotate(0deg)";
-
-          this.$refs.tip.style.top = "0px";
-          this.$refs.tip.style.left = "0px";
-          this.$refs.tip.style.transform = "rotate(0deg)";
+          if(this.$refs.tipBG){
+            this.$refs.tipBG.style.top = "0px";
+            this.$refs.tipBG.style.left = "0px";
+            this.$refs.tipBG.style.transform = "rotate(0deg)";
+          }
+          if(this.$refs.linetip){
+            this.$refs.linetip.style.top = "-1px";
+            this.$refs.linetip.style.left = "-4px";
+            this.$refs.linetip.style.transform = "rotate(0deg)";
+          }
+          if(this.$refs.tip){
+            this.$refs.tip.style.top = "0px";
+            this.$refs.tip.style.left = "0px";
+            this.$refs.tip.style.transform = "rotate(0deg)";
+          }
         }
       });
 
-      EventBus.$on('palletUp', (e) => {
+      EventBus.$on('palletUp', () => {
         if(this.sleeveDown){
           this.$refs.brush.style.top = window.innerHeight - 80 + "px";
           this.sleeveDown = false;
         }
       });
 
-      EventBus.$on('palletDn', (e) => {
+      EventBus.$on('palletDn', () => {
         if(!this.sleeveDown){
           this.$refs.brush.style.top = window.innerHeight - 20 + "px";
           this.sleeveDown = true;
@@ -145,27 +150,32 @@ export default {
       });
 
       EventBus.$on('pMv', (e)=>{
-        const top = e.offsetY;
+        let top = e.offsetY;
+        let left = e.offsetX;
 
         if(this.palletShow){
           this.$refs.brush.style.transform = "scaleY(1)"
           this.palletShow = false;
         }
 
-        if(!this.zoom){
-          /*
-          if(e.offsetY > window.innerHeight - window.innerHeight/5 && !this.palletShow){
-            this.palletShow = true;
-            top = e.offsetY - 45;
-            this.$refs.brush.style.transform = "scaleY(-1)"
-            EventBus.$emit('palletShow', true);
-          } else if(e.offsetY < window.innerHeight - window.innerHeight/9){
-            top = e.offsetY
-            this.$refs.brush.style.transform = "scaleY(1)"
-            this.palletShow = false;
-            EventBus.$emit('palletShow', false);
+        if(this.zoom){
+          if(e.offsetY < window.innerHeight/2 - 100){
+            top = window.innerHeight/2 - 100;
+          } else if(e.offsetY > window.innerHeight/2 + 85) {
+            top = window.innerHeight/2 + 85;
           }
-          */
+          if(e.offsetX < window.innerWidth/2 - 85){
+            left = window.innerWidth/2 - 85;
+          } else if(e.offsetX > window.innerWidth/2 + 120) {
+            left = window.innerWidth/2 + 120;
+          }
+          this.renderPos(left, top);
+
+          const posX = Math.round((left - window.innerWidth/2) + 85);
+          const posY = Math.round((top - window.innerHeight/2) + 100);
+
+          EventBus.$emit('zoomPos', {x: posX, y: posY});
+          return
         }
 
         this.renderPos(e.offsetX, top);
@@ -205,6 +215,15 @@ export default {
     }
     #lineTip .disabled{
       opacity: 0 !important;
+    }
+
+    #magBorder{
+      border: 1px solid;
+      position: absolute;
+      left: -90px;
+      top: -90px;
+      width: 180px;
+      height: 180px
     }
 
 </style>

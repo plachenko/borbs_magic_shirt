@@ -35,27 +35,38 @@ export default {
       points: [],
       strokes: [],
       frameN: 0,
+      zoomSize: 1,
+      zoomOffset: {x: 0, y: 0},
+      pos: {x: 0, y:0},
+      mPos: {x: 0, y:0}
     }
   },
   watch:{
     curPos(pnt){
       this.clear(1);
-      if(pnt && !this.zoom){
+      if(pnt){
         if(this.palletShow){
           EventBus.$emit('palletShow', false);
         }
 
+        const _pnt = pnt;
+
+        if(this.zoomed){
+          _pnt.x = pnt.x / 2 + this.zoomOffset.x;
+          _pnt.y = pnt.y / 2 + this.zoomOffset.y;
+        }
+
         if(!this.pntDn){
-          this.fpnt = Object.assign({}, pnt);
+          this.fpnt = Object.assign({}, _pnt);
           this.pntDn = true;
         }
 
         if(!this.points[this.frameN]){
-          this.points[this.frameN] = [this.fpnt, pnt];
+          this.points[this.frameN] = [this.fpnt, _pnt];
         }
 
-        this.points[this.frameN].push(pnt);
-        this.draw(1, this.points[this.frameN], this.color, this.lineColor);
+        this.points[this.frameN].push(_pnt);
+        this.draw(1, this.points[this.frameN], this.color, this.lineColor, this.zoomed);
       }else{
         this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
@@ -67,36 +78,13 @@ export default {
     }
   },
   methods:{
-    /*
-    zoomChange(){
-      let zoom;
-      if(this.zoomed){
-        this.zoomed = false;
-        zoom = .5;
-      }else{
-        this.zoomed = true;
-        zoom = 2;
-      }
-      this.strokes.forEach((stroke)=>{
-        for(let f = 0; f <= this.frameMax; f++){
-          if(stroke.points[f]){
-            stroke.points[f].forEach((pnt) => {
-              pnt.x = pnt.x *zoom;
-              pnt.y = pnt.y *zoom;
-            });
-          }
-        }
-      })
-      this.drawStrokes();
-    },
-    */
     frameChange(_frameN){
       this.frameN = _frameN;
       this.clear(0);
       this.clear(1);
 
       if(this.points[this.frameN]){
-        this.draw(1, this.points[this.frameN], this.color, this.lineColor);
+        this.draw(1, this.points[this.frameN], this.color, this.lineColor, this.zoomed);
       }
       this.drawStrokes();
     },
@@ -106,11 +94,6 @@ export default {
       this.drawStrokes();
       this.clear(1);
       this.$emit('strokeEvt');
-      /*
-      for(const i in this.$refs.can){
-        this.clear(i);
-      }
-      */
     },
     clear(idx){
       const can = this.$refs.can[idx];
@@ -138,23 +121,25 @@ export default {
         }
       })
     },
-    draw(idx, path, col, lCol){
+    draw(idx, path, col, lCol, zPath = false){
       const ctx = this.$refs.can[idx].getContext('2d');
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      if(idx == 1){
-        // this.clear(1);
+
+      if(this.pntDn && zPath){
+        console.log(zPath)
+        ctx.beginPath();
+        ctx.moveTo((path[0].x*2) - this.zoomOffset.x*2, (path[0].y*2)-this.zoomOffset.y*2);
+        path.forEach((point) => {
+          ctx.lineTo((point.x*2)-this.zoomOffset.x*2, (point.y*2)-this.zoomOffset.y*2);
+        });
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(path[0].x, path[0].y);
+        path.forEach((point) => {
+          ctx.lineTo(point.x, point.y);
+        });
       }
-
-      ctx.beginPath();
-      ctx.moveTo(path[0].x, path[0].y);
-      path.forEach((point, i) => {
-        ctx.lineTo(point.x, point.y);
-      });
-
-      // if(this.points){
-      //   ctx.lineTo(this.points[this.points.length-1].x, this.points[this.points.length-1].y)
-      // }
 
       if(col){
         ctx.fillStyle = '#' + col;
@@ -169,59 +154,21 @@ export default {
         ctx.strokeStyle = '#' + lCol;
         ctx.stroke();
       }
-      /*
-      path.forEach((point, i) => {
-        ctx.fillRect(point.x, point.y, 10, 10);
-      });
-      */
     },
-    zoomChange(x, y){
-      // console.log(x, y);
-      // console.log(this.zoomed);
+    zoomChange(){
+      this.clear(0);
       if(this.zoomed){
         this.zoomed = false;
         this.$refs.can[0].getContext('2d').scale(.5,.5);
-        // this.$refs.can[0].getContext('2d').translate(-x,-y);
+        this.$refs.can[0].getContext('2d').translate(this.zoomOffset.x * 2, this.zoomOffset.y * 2);
+        this.zoomSize = 1;
       }else{
         this.zoomed = true;
         this.$refs.can[0].getContext('2d').scale(2,2);
-        // this.$refs.can[0].getContext('2d').translate(x,y);
+        this.$refs.can[0].getContext('2d').translate(-1 * this.zoomOffset.x, -1 * this.zoomOffset.y);
+        this.zoomSize = 3;
       }
       this.drawStrokes();
-      /*
-      let zoom;
-      let offsetX = 0;
-      let offsetY = 0;
-      if(this.zoomed){
-        this.zoomed = false;
-        zoom = .25;
-        if(offsetX){
-          offsetX = -1 * offsetX;
-        }
-        offsetX = 0;
-
-        if(offsetY){
-          offsetY = -1 * offsetY;
-        }
-        offsetY = 0;
-      }else{
-        this.zoomed = true;
-        zoom = 4;
-        offsetX = 100;
-        offsetY = 100;
-      }
-      this.strokes.forEach((stroke)=>{
-        for(let f = 0; f <= this.frameMax; f++){
-          if(stroke.points[f]){
-            stroke.points[f].forEach((pnt) => {
-              pnt.x = Math.round(pnt.x *zoom) + offsetX;
-              pnt.y = Math.round(pnt.y *zoom) + offsetY;
-            });
-          }
-        }
-      })
-      this.drawStrokes();
-      */
     },
     renderCan(){
       const w = window.innerWidth;
@@ -265,6 +212,25 @@ export default {
   mounted(){
     const w = window.innerWidth;
 
+    document.addEventListener('keydown', (e)=>{
+      if(e.code == 'Backspace'){
+        this.clearAll();
+      }
+      if(e.code == 'KeyW'){
+        if(!this.zoom){
+          EventBus.$emit('toolToggle', 'Zoom')
+        }else{
+          EventBus.$emit('toolToggle', 'Brush')
+        }
+      }
+    });
+
+    EventBus.$on('zoomPos', (v) => {
+      if(!this.zoomed){
+        this.zoomOffset = v;
+      }
+    });
+
     EventBus.$on('palletShown', (v) => {
       this.palletShow = v;
     });
@@ -304,13 +270,15 @@ export default {
           x = Math.round(e.offsetX - paintPos.x) - 25;
           y = Math.round(e.offsetY - paintPos.y) - 55;
         }
-        this.zoomChange(x, y);
+        this.zoomChange();
       }
       this.md = true;
     });
 
     EventBus.$on('pUp', (e) => {
       this.md = false;
+      EventBus.$emit('toolToggle', 'Brush');
+
       if(e.touches){
         this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
@@ -320,8 +288,10 @@ export default {
       }
     });
 
+    const mag = document.getElementById('magBorder');
+    const cont = document.getElementById('canvasContainer');
+
     EventBus.$on('pMv', (e) => {
-      const cont = document.getElementById('canvasContainer');
       const paintPos = cont.getBoundingClientRect();
       let x, y;
 

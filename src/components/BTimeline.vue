@@ -82,7 +82,7 @@ export default {
     }
   },
   mounted(){
-    EventBus.$on('playToggle', (v) => {
+    EventBus.$on('playToggle', () => {
       this.togglePlay();
     })
     document.addEventListener('keydown', (e)=>{
