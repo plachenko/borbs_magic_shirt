@@ -13,7 +13,6 @@ export default {
 
     window.addEventListener('resize', (e)=>{
       EventBus.$emit('resize', e);
-      // console.log(window.innerWidth, window.innerHeight);
     });
 
     capRef.addEventListener('contextmenu', (e) => {
@@ -47,7 +46,6 @@ export default {
 
     capRef.addEventListener('pointermove', (e) => {
       EventBus.$emit('pMv', e);
-      // console.log(e);
       /*
       this.$refs.brush.style.width = (window.innerWidth - e.offsetX) + 'px';
       let top = e.screenY + 'px'

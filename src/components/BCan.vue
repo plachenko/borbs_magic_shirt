@@ -127,7 +127,6 @@ export default {
       ctx.lineJoin = "round";
 
       if(this.pntDn && zPath){
-        console.log(zPath)
         ctx.beginPath();
         ctx.moveTo((path[0].x*2) - this.zoomOffset.x*2, (path[0].y*2)-this.zoomOffset.y*2);
         path.forEach((point) => {
