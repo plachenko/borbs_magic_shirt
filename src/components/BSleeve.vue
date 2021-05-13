@@ -159,17 +159,22 @@ export default {
         }
 
         if(this.zoom){
-          if(e.offsetY < window.innerHeight/2 - 135){
-            top = window.innerHeight/2 - 135;
-          } else if(e.offsetY > window.innerHeight/2 + 90) {
-            top = window.innerHeight/2 + 90;
+          if(e.offsetY < window.innerHeight/2 - 100){
+            top = window.innerHeight/2 - 100;
+          } else if(e.offsetY > window.innerHeight/2 + 85) {
+            top = window.innerHeight/2 + 85;
           }
-          if(e.offsetX < window.innerWidth/2 - 120){
-            left = window.innerWidth/2 - 120;
+          if(e.offsetX < window.innerWidth/2 - 85){
+            left = window.innerWidth/2 - 85;
           } else if(e.offsetX > window.innerWidth/2 + 120) {
             left = window.innerWidth/2 + 120;
           }
           this.renderPos(left, top);
+
+          const posX = Math.round((left - window.innerWidth/2) + 85);
+          const posY = Math.round((top - window.innerHeight/2) + 100);
+
+          EventBus.$emit('zoomPos', {x: posX, y: posY});
           return
         }
 
@@ -215,10 +220,10 @@ export default {
     #magBorder{
       border: 1px solid;
       position: absolute;
-      left: -50px;
-      top: -50px;
-      width: 130px;
-      height: 130px
+      left: -90px;
+      top: -90px;
+      width: 180px;
+      height: 180px
     }
 
 </style>

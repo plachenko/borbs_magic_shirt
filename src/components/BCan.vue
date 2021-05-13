@@ -44,23 +44,44 @@ export default {
   watch:{
     curPos(pnt){
       this.clear(1);
-      if(pnt && !this.zoom){
+      if(pnt){
         if(this.palletShow){
           EventBus.$emit('palletShow', false);
         }
 
+        const _pnt = pnt;
+
+        if(this.zoomed){
+          _pnt.x = pnt.x / 2 + this.zoomOffset.x;
+          _pnt.y = pnt.y / 2 + this.zoomOffset.y;
+        }
+
         if(!this.pntDn){
-          this.fpnt = Object.assign({}, pnt);
+          this.fpnt = Object.assign({}, _pnt);
           this.pntDn = true;
         }
 
         if(!this.points[this.frameN]){
-          this.points[this.frameN] = [this.fpnt, pnt];
+          this.points[this.frameN] = [this.fpnt, _pnt];
         }
 
-        this.points[this.frameN].push(pnt);
-        this.draw(1, this.points[this.frameN], this.color, this.lineColor);
+        this.points[this.frameN].push(_pnt);
+        this.draw(1, this.points[this.frameN], this.color, this.lineColor, this.zoomed);
+
       }else{
+
+        /*
+        if(this.zoomed){
+          this.points.forEach((frame, idx)=>{
+            frame.forEach((pnt,pIdx) => {
+              pnt.x = pnt.x / 2 + this.zoomOffset.x;
+              pnt.y = pnt.y / 2 + this.zoomOffset.y;
+              console.log(pnt.x, pnt.y)
+            });
+          });
+        }
+        */
+
         this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
         this.points = [];
@@ -100,7 +121,7 @@ export default {
       this.clear(1);
 
       if(this.points[this.frameN]){
-        this.draw(1, this.points[this.frameN], this.color, this.lineColor);
+        this.draw(1, this.points[this.frameN], this.color, this.lineColor, this.zoomed);
       }
       this.drawStrokes();
     },
@@ -142,19 +163,32 @@ export default {
         }
       })
     },
-    draw(idx, path, col, lCol){
+    draw(idx, path, col, lCol, zPath = false){
       const ctx = this.$refs.can[idx].getContext('2d');
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      if(idx == 1){
-        // this.clear(1);
+
+      if(this.pntDn && zPath){
+        console.log(zPath)
+        ctx.beginPath();
+        ctx.moveTo((path[0].x*2) - this.zoomOffset.x*2, (path[0].y*2)-this.zoomOffset.y*2);
+        path.forEach((point) => {
+          ctx.lineTo((point.x*2)-this.zoomOffset.x*2, (point.y*2)-this.zoomOffset.y*2);
+        });
+        /*
+        ctx.moveTo((path[0].x*2)+ this.zoomOffset.x, (path[0].y*2)+ this.zoomOffset.y);
+        path.forEach((point) => {
+          ctx.lineTo((point.x*2) - this.zoomOffset.x, (point.y*2)- this.zoomOffset.y);
+        });
+        */
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(path[0].x, path[0].y);
+        path.forEach((point) => {
+          ctx.lineTo(point.x, point.y);
+        });
       }
 
-      ctx.beginPath();
-      ctx.moveTo(path[0].x, path[0].y);
-      path.forEach((point) => {
-        ctx.lineTo(point.x, point.y);
-      });
 
       // if(this.points){
       //   ctx.lineTo(this.points[this.points.length-1].x, this.points[this.points.length-1].y)
@@ -179,24 +213,25 @@ export default {
       });
       */
     },
-    zoomChange(x, y){
-      console.log(x, y);
-      // console.log(this.zoomed);
+    zoomChange(){
+      this.clear(0);
       if(this.zoomed){
         this.zoomed = false;
         this.$refs.can[0].getContext('2d').scale(.5,.5);
+        this.$refs.can[0].getContext('2d').translate(this.zoomOffset.x * 2, this.zoomOffset.y * 2);
         this.zoomSize = 1;
-        this.$refs.can[0].getContext('2d').translate(-x,-y);
       }else{
         this.zoomed = true;
         this.$refs.can[0].getContext('2d').scale(2,2);
+        this.$refs.can[0].getContext('2d').translate(-1 * this.zoomOffset.x, -1 * this.zoomOffset.y);
         this.zoomSize = 3;
-        this.$refs.can[0].getContext('2d').translate(x,y);
       }
       this.drawStrokes();
+
       /*
       let zoom;
       let offsetX = 0;
+      u
       let offsetY = 0;
       if(this.zoomed){
         this.zoomed = false;
@@ -272,12 +307,21 @@ export default {
     const w = window.innerWidth;
 
     document.addEventListener('keydown', (e)=>{
+      if(e.code == 'Backspace'){
+        this.clearAll();
+      }
       if(e.code == 'KeyW'){
         if(!this.zoom){
           EventBus.$emit('toolToggle', 'Zoom')
         }else{
           EventBus.$emit('toolToggle', 'Brush')
         }
+      }
+    });
+
+    EventBus.$on('zoomPos', (v) => {
+      if(!this.zoomed){
+        this.zoomOffset = v;
       }
     });
 
@@ -320,7 +364,7 @@ export default {
           x = Math.round(e.offsetX - paintPos.x) - 25;
           y = Math.round(e.offsetY - paintPos.y) - 55;
         }
-        this.zoomChange(x, y);
+        this.zoomChange();
       }
       this.md = true;
     });
@@ -352,8 +396,6 @@ export default {
         x = Math.round(e.offsetX - paintPos.x) - 25;
         y = Math.round(e.offsetY - paintPos.y) - 55;
       }
-
-      console.log(x, y);
 
       if(this.md){
         this.curPos = {x: x, y: y};
