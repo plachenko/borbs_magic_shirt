@@ -67,21 +67,7 @@ export default {
 
         this.points[this.frameN].push(_pnt);
         this.draw(1, this.points[this.frameN], this.color, this.lineColor, this.zoomed);
-
       }else{
-
-        /*
-        if(this.zoomed){
-          this.points.forEach((frame, idx)=>{
-            frame.forEach((pnt,pIdx) => {
-              pnt.x = pnt.x / 2 + this.zoomOffset.x;
-              pnt.y = pnt.y / 2 + this.zoomOffset.y;
-              console.log(pnt.x, pnt.y)
-            });
-          });
-        }
-        */
-
         this.pntDn = false;
         this.strokes.push({points: this.points, col: this.color, lCol: this.lineColor});
         this.points = [];
@@ -92,29 +78,6 @@ export default {
     }
   },
   methods:{
-    /*
-    zoomChange(){
-      let zoom;
-      if(this.zoomed){
-        this.zoomed = false;
-        zoom = .5;
-      }else{
-        this.zoomed = true;
-        zoom = 2;
-      }
-      this.strokes.forEach((stroke)=>{
-        for(let f = 0; f <= this.frameMax; f++){
-          if(stroke.points[f]){
-            stroke.points[f].forEach((pnt) => {
-              pnt.x = pnt.x *zoom;
-              pnt.y = pnt.y *zoom;
-            });
-          }
-        }
-      })
-      this.drawStrokes();
-    },
-    */
     frameChange(_frameN){
       this.frameN = _frameN;
       this.clear(0);
@@ -131,11 +94,6 @@ export default {
       this.drawStrokes();
       this.clear(1);
       this.$emit('strokeEvt');
-      /*
-      for(const i in this.$refs.can){
-        this.clear(i);
-      }
-      */
     },
     clear(idx){
       const can = this.$refs.can[idx];
@@ -175,12 +133,6 @@ export default {
         path.forEach((point) => {
           ctx.lineTo((point.x*2)-this.zoomOffset.x*2, (point.y*2)-this.zoomOffset.y*2);
         });
-        /*
-        ctx.moveTo((path[0].x*2)+ this.zoomOffset.x, (path[0].y*2)+ this.zoomOffset.y);
-        path.forEach((point) => {
-          ctx.lineTo((point.x*2) - this.zoomOffset.x, (point.y*2)- this.zoomOffset.y);
-        });
-        */
       } else {
         ctx.beginPath();
         ctx.moveTo(path[0].x, path[0].y);
@@ -188,11 +140,6 @@ export default {
           ctx.lineTo(point.x, point.y);
         });
       }
-
-
-      // if(this.points){
-      //   ctx.lineTo(this.points[this.points.length-1].x, this.points[this.points.length-1].y)
-      // }
 
       if(col){
         ctx.fillStyle = '#' + col;
@@ -207,11 +154,6 @@ export default {
         ctx.strokeStyle = '#' + lCol;
         ctx.stroke();
       }
-      /*
-      path.forEach((point, i) => {
-        ctx.fillRect(point.x, point.y, 10, 10);
-      });
-      */
     },
     zoomChange(){
       this.clear(0);
@@ -227,42 +169,6 @@ export default {
         this.zoomSize = 3;
       }
       this.drawStrokes();
-
-      /*
-      let zoom;
-      let offsetX = 0;
-      u
-      let offsetY = 0;
-      if(this.zoomed){
-        this.zoomed = false;
-        zoom = .25;
-        if(offsetX){
-          offsetX = -1 * offsetX;
-        }
-        offsetX = 0;
-
-        if(offsetY){
-          offsetY = -1 * offsetY;
-        }
-        offsetY = 0;
-      }else{
-        this.zoomed = true;
-        zoom = 4;
-        offsetX = 100;
-        offsetY = 100;
-      }
-      this.strokes.forEach((stroke)=>{
-        for(let f = 0; f <= this.frameMax; f++){
-          if(stroke.points[f]){
-            stroke.points[f].forEach((pnt) => {
-              pnt.x = Math.round(pnt.x *zoom) + offsetX;
-              pnt.y = Math.round(pnt.y *zoom) + offsetY;
-            });
-          }
-        }
-      })
-      this.drawStrokes();
-      */
     },
     renderCan(){
       const w = window.innerWidth;
