@@ -122,6 +122,12 @@ export default {
       this.$refs.file.click();
     },
     modalShow(opts){
+      const canRef = this.$refs.paintCan;
+
+      if(canRef.zoomed && opts){
+        canRef.zoomChange();
+      }
+
       this.modalOpts = opts;
     },
     modalExit(){
