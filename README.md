@@ -2,7 +2,7 @@
 
 Paint with Borb and his friends using his special magic shirt! 
 
-A small web-based drawing application inspired by [Tom Thinks](https://www.twitch.tv/tomthinks) on twitch and his friend Borb the talking gourd!
+A small web-based drawing application inspired by [Tom Thinks](https://www.twitch.tv/tomthinks) on twitch and his friend [Borb the talking gourd!](https://www.youtube.com/watch?v=q5GN9UM7unE)
 
 ## Gallery
 
